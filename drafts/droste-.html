@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic' rel='stylesheet' type='text/css'>
+
+    <link rel="stylesheet" type="text/css" href="http://roy.red/theme/stylesheet/style.min.css">
+
+  <link rel="stylesheet" type="text/css" href="http://roy.red/theme/stylesheet/pygments.min.css">
+  <link rel="stylesheet" type="text/css" href="http://roy.red/theme/stylesheet/font-awesome.min.css">
+  <link rel="stylesheet" type="text/css" href="http://roy.red/theme/stylesheet/glslEditor.css">
+  <script type="application/javascript" src="http://roy.red/theme/script/glslEditor.js"></script>
+  <script type="application/javascript" src="http://roy.red/theme/script/loadglsl.js"></script>
+
+
+    <link href="http://roy.red/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Roy.red Atom">
+
+
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="" />
+
+<meta name="author" content="Roy Wiggins" />
+<meta name="description" content="" />
+<meta name="keywords" content="">
+<meta property="og:site_name" content="Roy.red"/>
+<meta property="og:title" content="Droste"/>
+<meta property="og:description" content=""/>
+<meta property="og:locale" content="en_US"/>
+<meta property="og:url" content="http://roy.red/drafts/droste-.html"/>
+<meta property="og:type" content="article"/>
+<meta property="article:published_time" content="2016-04-12 23:34:58-07:00"/>
+<meta property="article:modified_time" content=""/>
+<meta property="article:author" content="http://roy.red/author/roy-wiggins.html">
+<meta property="article:section" content="misc"/>
+<meta property="og:image" content="">
+  <title>Roy.red &ndash; Droste</title>
+</head>
+<body>
+  <aside>
+    <div>
+      <a href="http://roy.red">
+        <img src="http://roy.red/theme/img/profile.png" alt="" title="">
+      </a>
+      <h1><a href="http://roy.red"></a></h1>
+      <p></p>
+      <nav>
+        <ul class="list">
+          <li><a href="http://getpelican.com/" target="_blank">Pelican!</a></li>
+          <li><a href="http://jinja.pocoo.org/" target="_blank">Jinja2</a></li>
+        </ul>
+      </nav>
+      <ul class="social">
+        <li><a class="sc-@RoyWiggins" href="https://twitter.com/RoyWiggins" target="_blank"><i class="fa fa-@RoyWiggins"></i></a></li>
+      </ul>
+    </div>
+  </aside>
+  <main>
+
+<article>
+  <header>
+    <h1 id="droste">Droste</h1>
+    <p>Posted on Tue 12 April 2016 in <a href="http://roy.red/category/misc.html">misc</a></p>
+  </header>
+  <div>
+    <p><a href="http://roy.red/images/Droste.jpg"><img style="float: right;" width="200" src="http://roy.red/images/Droste.jpg"></a></p>
+<p>In this post, I'm going to explore how to implement the so-called "<a href="https://en.wikipedia.org/wiki/Droste_effect">Droste effect</a>." The Droste effect is a name given to pictures that contain themselves, like an infinite series of nesting dolls. The conventional Droste effect is interesting, but it was taken to new heights by M.C. Escher's "Print Gallery." </p>
+<p><a href="http://escherdroste.math.leidenuniv.nl/images/scan450.jpg"><img style="float: left; margin-right:1em; margin-bottom:0.5em" src="http://roy.red/images/print-gallery.jpg"></a></p>
+<p>The Print Gallery has the peculiar quality that if you follow the gaze of the person in the lower right corner, into the picture he is looking at, and around the image clockwise you find that you have come back to where you started: looking at a figure, looking at a picture. In some sense, this is a "Droste" picture: the print gallery contains a picture of the city that the print gallery is located in. <a href="http://escherdroste.math.leidenuniv.nl/">Clever mathematicians and artists in the Netherlands</a> managed to reverse-engineer the picture, and determined a transformation that can take an ordinary Droste image to a twisted, Escher-like image. They published an <a href="http://www.ams.org/notices/200304/fea-escher.pdf">article</a> explaining how it works, but on first and second reading I will admit I could make neither head nor tails of it. If it makes more sense to you, the rest of this post is going to be mostly superfluous! If you want to play with an existing implementation, check out <a href="http://www.photospiralysis.com/">Photospiralysis</a>, which works in the browser.</p>
+<p>I wanted to understand how Escher's Print Gallery effect actually worked, and implement it myself. Luckily, the incomparable Jos Leys has written a pretty straightforward <a href="http://www.josleys.com/article_show.php?id=82">explanation</a>, with pictures &amp; equations. Most of the following is going to be lifted directly from his page, except we're going to implement it as we read along. Read his page first, or at least skim it.</p>
+<p>The implementation will be as a GLSL fragment shader (aka pixel shader). These are fast, and if you stick to GLSL2.0, it will work happily in the browser and many other places. If you've never touched pixel shaders, it would help to at least glance over <a href="http://patriciogonzalezvivo.com/2015/thebookofshaders/01/">The Book of Shaders</a> first. I am borrowing the author's code framework for displaying live examples.</p>
+<p>Jos Leys explains how the transformation goes forward from a square image to a Droste image. To work as a pixel shader, we're going to <strong>invert the transformation</strong>: for each point in the Droste image, we work out which point on the original image maps to it, and color our pixel accordingly. Working in this mode gives a feel of "warping space" rather than warping the image directly. </p>
+<hr />
+<p>We'll begin the same: with an annulus, the area between two circles. I am eliding how the annulus is actually drawn, mostly because I'm not an expert shader writer and my code isn't great. Read The Book of Shaders linked above if you want to learn more about drawing shapes in GLSL.</p>
+<p>Don't forget that these examples are live: you can fiddle with them!</p>
+<div class="codeAndCanvas" data="float r1 = 0.3;
+float r2 = 0.7;
+vec3 color(vec2 z) {
+    return circles(z,r1,r2);
+}"></div>
+
+<p>We are going to think of the annulus as actually sitting in the <a href="https://en.wikipedia.org/wiki/Complex_plane">complex plane</a>. We can perform complex arithmetic on our pixels! If you're unfamiliar with complex numbers, it suffices for our purposes to know that complex numbers have two "coordinates" (real and imaginary) and points in the complex plane can be represented as a single number: <span class="math">\((x,y)\)</span> in the ordinary plane can be thought of as <span class="math">\(x+yi\)</span>, a complex number. In GLSL, complex numbers are stored identically to a point in the plane: a <code>vec2</code>.</p>
+<p>You can perform arithmetic on complex numbers in similar ways to ordinary numbers. Addition, multiplication, and exponentiation all have equivalents in the complex plane. Most important for us is the <a href="https://en.wikipedia.org/wiki/Exponentiation#Imaginary_exponents_with_base_e">complex exponent</a> and its inverse, the complex logarithm.</p>
+<p><span class="math">\(z \rightarrow \log(z)\)</span> has the property that it transforms complex numbers within <span class="math">\(r\)</span> units of the origin into a strip <span class="math">\(2 \pi\)</span> high and <span class="math">\(\log(r)\)</span> wide. </p>
+<p><span class="math">\(z \rightarrow \log(\frac{z}{r1})\)</span> takes the annulus to a similar strip: points inside the annulus are transformed into points within a strip <span class="math">\(2 \pi\)</span> high and <span class="math">\(\log(\frac{r2}{r1})\)</span> wide.</p>
+<p>The inverse is <span class="math">\(z \rightarrow e^{z} \cdot r1\)</span>, which we write as <code>z = cMul(cExp(z),vec2(r1,0.0))</code>:</p>
+<div class="codeAndCanvas" data="float r1 = 0.2;
+float r2 = 0.7;
+vec3 color(vec2 z) {
+    z = z*4.0; // just so we can see more
+    z = cMul(cExp(z),vec2(r1,0.0));
+    return circles(z,r1,r2);
+}"></div>
+
+<p>And we obtain the strip we were looking for. But wait, it's infinitely tall! What's going on? The complex <span class="math">\(\log\)</span> is a multi-valued function: it maps the annulus to an infinite number of strips, all stacked up. It's defined as the inverse of the exponential function, and the exponential function actually takes points inside the infinitely tall ribbon to the annulus over and over again. In other words, <span class="math">\(e^{a+bi} = e^{a+(b+2\pi)i}\)</span>.</p>
+<p>So, now we're in what I call <span class="math">\(\exp\)</span>-space. The rules are a bit different here. Just looking at the strip we have, left and right correspond to "in-out" in ordinary space; up and down correspond to rotating around the origin. This is the property that will generate the telescoping copies we want! We tile the ribbon horizontally in <span class="math">\(\exp\)</span>-space using the modulo function:</p>
+<div class="codeAndCanvas" data="float r1 = 0.2;
+float r2 = 0.7;
+vec3 color(vec2 z) {
+    z = z*4.0; 
+    // 2. Tile the strips
+    z.x = mod(z.x,log(r2/r1)); 
+    // 1. Take the annulus to a strip
+    z = cMul(cExp(z),vec2(r1,0.0));
+    return circles(z,r1,r2);
+}"></div>
+
+<p>This looks like the wrong order, but since we're actually building an inverse function, later transformations need to be applied above earlier ones. Let's use <span class="math">\(\log\)</span> to leave <span class="math">\(\exp\)</span>-space and see what our infinite tiling achieved.</p>
+<div class="codeAndCanvas" data="float r1 = 0.2;
+float r2 = 0.7;
+vec3 color(vec2 z) {
+    z = z*1.0; // Play with this to zoom
+    // 3. Take the tiled strips back to ordinary space.
+    z = cLog(z); 
+    // 2. Tile the strips
+    z.x = mod(z.x,log(r2/r1));
+    // 1. Take the annulus to a strip
+    z = cMul(cExp(z),vec2(r1,0.0));
+    return circles(z,r1,r2);
+}"></div>
+
+<p>Wow! We're well on our way. Each strip is transformed into another annulus, one nested inside the other. We can zoom in or out as much as we want, and there will always be another nesting annulus. We are sure of this because of the infinite tiling in <span class="math">\(\exp\)</span>-space.</p>
+<p>By rotating and scaling the strips in <span class="math">\(\exp\)</span>-space, we can create the spiral effect we are looking for. The transformation code here is just an inversion of the Jos Ley's transformation in his step (2): <span class="math">\(z \rightarrow \frac{z}{e^{\theta i} \cdot cos(\theta)}\)</span></p>
+<div class="codeAndCanvas" data="float r1 = 0.2;
+float r2 = 0.7;
+vec3 color(vec2 z) {
+    z = z*4.0; 
+    // 3. Scale and rotate the strips
+    float scale = log(r2/r1);
+    float angle = atan(scale/(2.0*PI));
+    z = cDiv(z, cMul(cExp(vec2(0,angle)), vec2(cos(angle),0)));
+    // 2. Tile the strips
+    z.x = mod(z.x,scale);
+    // 1. Take the annulus to a strip
+    z = cMul(cExp(z),vec2(r1,0.0));
+    return circles(z,r1,r2);
+}"></div>
+
+<p>Recall that <span class="math">\(a+bi\)</span> and <span class="math">\(a+(b+2\pi)i\)</span> are transformed to the same point under the complex logarithm. After this rotation and scale, the top-right corner of each strip is exactly <span class="math">\(2\pi\)</span> above the bottom-left. After the logarithmic transformation, the upper right corner of each strip will coincide with the bottom-left corner of the previous. The inner circle and outer circle will connect! The result is a smooth spiral.</p>
+<div class="codeAndCanvas" data="float r1 = 0.2;
+float r2 = 0.7;
+vec3 color(vec2 z) {
+    // 4. Take the tiled strips back to ordinary space.
+    z = cLog(z);
+    // 3. Scale and rotate the strips
+    float scale = log(r2/r1);
+    float angle = atan(scale/(2.0*PI));
+    z = cDiv(z, cMul(cExp(vec2(0,angle)), vec2(cos(angle),0))); 
+    // 2. Tile the strips
+    z.x = mod(z.x,scale);
+    // 1. Take the annulus to a strip
+    z = cMul(cExp(z),vec2(r1,0.0));
+    return circles(z,r1,r2);
+}"></div>
+
+<p>Now we have a droste effect put together, we can abstract it out to a function. Rather than drawing an annulus, we're going to draw a simple pattern to show what the effect does to more arbitrary shapes. Notice that with a small r1 it begins to resemble the Print Gallery, except the twist is going in the other direction.</p>
+<div class="codeAndCanvas" data="float r1 = 0.1;
+float r2 = 2.0;
+vec2 droste(vec2 z) {
+    // 4. Take the tiled strips back to ordinary space.
+    z = cLog(z);
+    // 3. Scale and rotate the strips
+    float scale = log(r2/r1);
+    // Negate the angle to twist the other way
+    float angle = atan(scale/(2.0*PI));
+    z = cDiv(z, cMul(cExp(vec2(0,angle)), vec2(cos(angle),0))); 
+    // 2. Tile the strips
+    z.x = mod(z.x,scale);
+    // 1. Take the annulus to a strip
+    z = cMul(cExp(z),vec2(r1,0.0));
+    return z;
+}
+vec3 color(vec2 z){
+    z = droste(z);
+    // Draw anything you want below!
+    return vec3(clamp(0.,.1,sin(z.x*25.)*sin(z.y*25.))/.1);
+}
+"></div>
+
+<p>In the next post(s), I'll explore how to handle Drostifying a square. I'll also show how to generalize the effect by adjusting how much it twists, how many arms the spiral has, and more. </p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    var location_protocol = (false) ? 'https' : document.location.protocol;
+    if (location_protocol !== 'http' && location_protocol !== 'https') location_protocol = 'https:';
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = location_protocol + '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+  </div>
+  <div class="tag-cloud">
+    <p>
+    </p>
+  </div>
+</article>
+
+    <footer>
+        <p>&copy; Roy Wiggins </p>
+<p>Built using <a href="http://getpelican.com" target="_blank">Pelican</a> - <a href="https://github.com/alexandrevicenzi/flex" target="_blank">Flex</a> theme by <a href="http://alexandrevicenzi.com" target="_blank">Alexandre Vicenzi</a></p>    </footer>
+  </main>
+
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BlogPosting",
+  "name": "Droste",
+  "headline": "Droste",
+  "datePublished": "2016-04-12 23:34:58-07:00",
+  "dateModified": "",
+  "author": {
+    "@type": "Person",
+    "name": "Roy Wiggins",
+    "url": "http://roy.red/author/roy-wiggins.html"
+  },
+  "image": "{{ SITEURL }}/{{ THEME_STATIC_DIR }}/img/profile.png",
+  "url": "http://roy.red/drafts/droste-.html",
+  "description": ""
+}
+</script>  
+</body>
+</html>
