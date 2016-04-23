@@ -1,4 +1,4 @@
-var glslCanvas = [];
+var glslCanvases = [];
 var glslEditors = [];
 var glslGraphs = [];
 function loadGlslElements() {
@@ -102,7 +102,7 @@ void main(){\n\
     // Load single Shaders
     var canvas = document.getElementsByClassName("canvas");
     for (var i = 0; i < canvas.length; i++){
-        glslCanvas.push(new GlslCanvas(canvas[i]));
+        glslCanvases.push(new GlslCanvas(canvas[i]));
     } 
 
     // parse EDITORS
@@ -125,6 +125,4 @@ void main(){\n\
         }
     }    
 }
-window.onload = function(){
-    loadGlslElements();
-}
+loadGlslElements();
