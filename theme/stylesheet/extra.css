@@ -1,0 +1,11 @@
+@media (max-width:1000px){
+	canvas.ge_canvas {
+		float:none !important; 
+		width:50%;
+		margin-left:25%;
+		top:0px !important;
+	}
+}
+.ge_export_icon {
+	visibility: hidden;
+}
