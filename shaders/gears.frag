@@ -1,3 +1,14 @@
+// Author: 
+// Title: 
+
+#ifdef GL_ES
+precision mediump float;
+#endif
+
+uniform vec2 u_resolution;
+uniform vec2 u_mouse;
+uniform float u_time;
+
 // Author: Roy Wiggins
 // Title: Gearworld
 
@@ -9,10 +20,6 @@
 #ifdef GL_ES
 precision mediump float;
 #endif
-
-uniform vec2 u_resolution;
-uniform vec2 u_mouse;
-uniform float u_time;
 
 vec3 smoothstepr(float center, float width, vec3 value){
 	return smoothstep(center-width/2.,center+width/2.,value);
@@ -30,9 +37,9 @@ vec3 smoothgear(in vec3 col, vec2 z, float r, float n, float toothHeight){
 	float val;
 	val = 1.0 - smoothstep(0.,0.01,sin(R)+sin(theta*n)*toothHeight/2.);
 	val = val+smoothstepr(R-toothHeight/5.,0.01,vec3(0.)).x-1. ;
-	val = clamp(0.,1.,val);
+	val = clamp(val,0.,1.);
 	val = val+smoothstepr(R+toothHeight/5.,0.01,vec3(0.)).x ;
-	return vec3(clamp(0.,1.,val));
+	return vec3(clamp(val,0.,1.));
 }
 mat3  rotationMatrix3(vec3 v, float angle)
 {
@@ -70,12 +77,12 @@ vec3 planetaryLinkage(vec2 z){
 	float nPlanets = 10.;
 
 	z = rotate2(z,-stime*1.5);
-	vec3 annulusColor = vec3(1,1,1);
+	vec3 annulusColor = vec3(1.,.1,.1);
 	addColor(col,annulusColor,vec3(1)-smoothgear(col,rotate2(z,  0.),sunRadius+planetRadius+sunToothHeight*2.,annulusTeeth,0.1));
 	addColor(col,annulusColor,smoothgear(col,rotate2(z,  stime*sunSpeed),sunRadius,sunTeeth,sunToothHeight*1.5));
 
 	for( float x = 0.; x<360.; x += 36.){
-		addColor(col,vec3(0.5,0.5,0.5),planetGear(col,z,sunRadius+0.061,planetRadius-0.018,planetTeeth,carrierSpeed,planetSpeed,stime,x));
+		addColor(col,vec3(0.925,0.701,0.),planetGear(col,z,sunRadius+0.061,planetRadius-0.018,planetTeeth,carrierSpeed,planetSpeed,stime,x));
 	}
 	return col;
 }
@@ -191,16 +198,17 @@ void droste(inout vec2 z, float r1, float r2, float Branches, float stretch, flo
 
 }
 
+
 void main() {
     vec2 st = gl_FragCoord.xy/u_resolution.xy;
     st -= .5;
     st.x *= u_resolution.x/u_resolution.y;
-    st *= 4.;
+    st *= 2.;
     vec3 color;
     vec2 uv = st;
-    st = st - vec2(1.5,0.);
+    st = st - vec2(1.,0.);
     droste(st,0.5,1.0,1.,1.,0.);
 	color = planetaryLinkage(st) * vec3(step(0.0,uv.x));
-    color += planetaryLinkage(uv+vec2(1.5,0)) * vec3(step(uv.x,0.0));
+    color += planetaryLinkage(uv+vec2(1.,0)) * vec3(step(uv.x,0.0));
     gl_FragColor = vec4(color,1.0);
 }

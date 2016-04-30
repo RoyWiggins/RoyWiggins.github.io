@@ -6,6 +6,13 @@
 		top:0px !important;
 	}
 }
+canvas.ge_canvas{
+	margin-bottom:0.5em;
+}
+
+article {
+	overflow: auto;
+}
 .ge_export_icon {
 	visibility: hidden;
 }
