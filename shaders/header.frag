@@ -120,3 +120,49 @@ float iqnoise( in vec2 x, float u, float v ){
 
     return va/wt;
 }
+
+// http://www.iquilezles.org/www/articles/functions/functions.htm
+
+float pcurve( float x, float a, float b )
+{
+    float k = powf(a+b,a+b) / (pow(a,a)*pow(b,b));
+    return k * powf( x, a ) * powf( 1.0-x, b );
+}
+
+float parabola( float x, float k )
+{
+    return powf( 4.0f*x*(1.0f-x), k );
+}
+float expStep( float x, float k, float n )
+{
+    return expf( -k*powf(x,n) );
+}
+    
+
+float cubicPulse( float c, float w, float x )
+{
+    x = fabsf(x - c);
+    if( x>w ) return 0.0f;
+    x /= w;
+    return 1.0f - x*x*(3.0f-2.0f*x);
+}
+    
+
+float impulse( float k, float x )
+{
+    const float h = k*x;
+    return h*expf(1.0f-h);
+}
+
+    
+
+float almostIdentity( float x, float m, float n )
+{
+    if( x>m ) return x;
+
+    const float a = 2.0f*n - m
+    const float b = 2.0f*m - 3.0f*n;
+    const float t = x/m;
+
+    return (a*t + b)*t*t + n;
+}

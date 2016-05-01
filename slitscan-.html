@@ -119,7 +119,7 @@ vec3 color(vec2 pt) {
     float rInv = 1./dist(pt);
     // Uncomment below to show contours
     // return vec3(fract(rInv));
-    pt = pt * rInv - vec2(rInv+u_time,0.0);
+    pt = pt * rInv - vec2(rInv+mod(u_time,6000.),0.0);
     return vec3(iqnoise(5.*pt,1.,1.)+0.09*rInv);
 }"></div>
 
