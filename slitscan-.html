@@ -99,7 +99,7 @@
 <div class="codeAndCanvas" data="vec3 color(vec2 pt) {
     pt = 1.2*pt;
     float rInv = 1./length(pt);
-    pt = pt * rInv - vec2(rInv+2.*u_time,0.0);
+    pt = pt * rInv - vec2(rInv+2.*mod(u_time,6000.),0.0);
     vec3 color = vec3(0.659,0.772,1.000);
     return color*vec3(iqnoise(5.*pt,1.,1.)+0.240*rInv);
 }"></div>
