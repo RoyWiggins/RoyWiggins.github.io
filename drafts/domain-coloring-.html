@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic' rel='stylesheet' type='text/css'>
+
+    <link rel="stylesheet" type="text/css" href="../theme/stylesheet/style.min.css">
+    <link rel="stylesheet" type="text/css" href="../theme/stylesheet/extra.css">
+  <link rel="stylesheet" type="text/css" href="../theme/stylesheet/pygments.min.css">
+  <link rel="stylesheet" type="text/css" href="../theme/stylesheet/font-awesome.min.css">
+    <link type="text/css" rel="stylesheet" href="https://rawgit.com/patriciogonzalezvivo/glslEditor/gh-pages/build/glslEditor.css">
+    <script type="application/javascript" src="https://rawgit.com/patriciogonzalezvivo/glslEditor/gh-pages/build/glslEditor.js"></script>
+  <script type="text/javascript" src="https://rawgit.com/patriciogonzalezvivo/glslCanvas/master/build/GlslCanvas.min.js"></script>
+
+
+
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="" />
+
+<meta name="author" content="Roy Wiggins" />
+<meta name="description" content="" />
+<meta name="keywords" content="">
+<meta property="og:site_name" content="Roy.red"/>
+<meta property="og:title" content="Domain Coloring"/>
+<meta property="og:description" content=""/>
+<meta property="og:locale" content="en_US"/>
+<meta property="og:url" content="../drafts/domain-coloring-.html"/>
+<meta property="og:type" content="article"/>
+<meta property="article:published_time" content="2016-05-09 17:39:02-07:00"/>
+<meta property="article:modified_time" content=""/>
+<meta property="article:author" content="../author/roy-wiggins.html">
+<meta property="article:section" content="misc"/>
+<meta property="og:image" content="">
+  <title>Roy.red &ndash; Domain Coloring</title>
+</head>
+<body>
+  <aside>
+    <div>
+      <a href="..">
+        <img src="../theme/img/profile.png" alt="" title="">
+      </a>
+      <h1><a href=".."></a></h1>
+      <p></p>
+      <nav>
+        <ul class="list">
+          <li><a href="http://getpelican.com/" target="_blank">Pelican!</a></li>
+          <li><a href="http://jinja.pocoo.org/" target="_blank">Jinja2</a></li>
+        </ul>
+      </nav>
+      <ul class="social">
+        <li><a class="sc-@RoyWiggins" href="https://twitter.com/RoyWiggins" target="_blank"><i class="fa fa-@RoyWiggins"></i></a></li>
+      </ul>
+    </div>
+  </aside>
+  <main>
+
+<article>
+  <header>
+    <h1 id="domain-coloring">Domain Coloring</h1>
+    <p>Posted on Mon 09 May 2016 in <a href="../category/misc.html">misc</a></p>
+  </header>
+  <div>
+    <p>To begin with, I'm going to talk about complex functions. Complex functions take a complex number as input and return another. It's a bit tricky to visualize them, since between the two-dimensional range and two-dimensional domain, the result is four-dimensional. A common method for visualizing these functions is domain coloring.</p>
+<div class="codeAndCanvas" data="vec3 domain(vec2 z){
+    return vec3(hsv2rgb(vec3(atan(z.y,z.x)/PI2,1.,1.)));
+}
+vec3 color(vec2 z) {
+    return domain(z);
+}"></div>
+
+<p>The idea behind domain coloring is that you draw a picture of a complex function <span class="math">\(f: \mathbb{ C } \mapsto \mathbb{ C }\)</span> by coloring the domain and pulling those colors back by <span class="math">\(f\)</span>. In other words you color <span class="math">\(z\)</span> the same as <span class="math">\(f(z)\)</span> is colored. The particular method I'm using is called a phase diagram, (TODO). It colors the domain by the phase, or the angle it makes with the positive real axis. </p>
+<p>In the example above, I'm just drawing the domain with no complex function at all (or, if you like, the identity <span class="math">\(f: z \mapsto z\)</span>). Notice that it's very obvious where 0 is, because the colors all "bunch up" around it. We'll see a similar effect near the zeros of a more complicated function. Here is the phase plot for <span class="math">\(f: z \mapsto z / (z^2 + z + 1)\)</span>. </p>
+<div class="codeAndCanvas" data="vec3 domain(vec2 z){
+    return vec3(hsv2rgb(vec3(atan(z.y,z.x)/PI2,1.,1.)));
+}
+vec3 color(vec2 z) {
+    z = z * 2.;
+    z = cDiv(z-vec2(1.,0), cMul(z,z)+z+vec2(1.,0));
+    return domain(z);
+}"></div>
+
+<p>Something funny's happening. There's three zero-like regions, but the two on the left are different- if you follow the hues around in a circle, they are cycling the "wrong way". They're not zeros at all, but poles: the center of these regions is where <span class="math">\(f\)</span> goes to infinity. You can't explain this easily without invoking the Riemann sphere, which is much less intimidating than it sounds. </p>
+<p><center><img width="60%" src="http://upload.wikimedia.org/wikipedia/commons/7/7c/Riemann_sphere1.jpg"/></center></p>
+<p>Thankfully, the Riemann sphere is a simple idea. Imagine that the complex plane is actually sitting in 3D space. If you place a sphere at the origin, you can <a href="">stereographically project</a> points on the plane (complex numbers) to the sphere and back again, by casting a ray out from the top of the sphere. The lower hemisphere is identified with the unit disk, while the northern upper is identified with the entire rest of the plane. An ant that lives on the complex plane that starts at the origin, can march outwards and the further it goes, the further its twin on the sphere approaches the north pole. If we map our domain coloring to the Riemann sphere, the colors get "gathered together" at the top of the sphere, which is why they gather together around infinities as well. </p>
+<div class="codeAndCanvas" data="vec3 domain(vec2 z){
+    return vec3(hsv2rgb(vec3(atan(z.y,z.x)/PI2,1.,1.)));
+}
+vec3 color(vec2 z) {
+    float dist;
+    z = projectToSphere(z,dist);
+    if (dist > 0.){
+        return domain(z);
+    }
+    return vec3(0);
+}"></div>
+
+<div style='clear:right'></div>
+
+<div class="codeAndCanvas" data="vec2 f(vec2 z,vec2 c){    
+    z = cPower2(z,vec2(2.,0));
+    return z = z+c;
+}
+vec3 domain(vec2 z){
+    float r1 = 0.2; float r2 = 1.0;
+    // 4. Take the tiled strips back to ordinary space.
+    z = cLog(z);
+    // 3. Scale and rotate the strips
+    float scale = log(r2/r1);
+    float angle = atan(scale/(2.0*PI));
+    z = cDiv(z, cExp(vec2(0,angle))*cos(angle)); 
+    // 2. Tile the strips
+    z.x = mod(z.x,scale);
+    // 1. Take the annulus to a strip
+    z = cExp(z)*r1;
+    return circles(z,r1,r2);
+}
+
+vec3 color(vec2 z) {
+    float dist=1.;
+    z = z * 2.;
+    vec2 z0 = z;   
+    for (int i=0; i<3;i++){
+        z = f(z,z0);
+    }
+    z = cDiv((z+vec2(-1,0.000)),(z-vec2(-1.,-0.00)));       
+    return domain(z);
+}"></div>
+
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    var location_protocol = (false) ? 'https' : document.location.protocol;
+    if (location_protocol !== 'http' && location_protocol !== 'https') location_protocol = 'https:';
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = location_protocol + '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+  </div>
+  <div class="tag-cloud">
+    <p>
+    </p>
+  </div>
+</article>
+
+    <footer>
+        <p>&copy; Roy Wiggins </p>
+<p>Built using <a href="http://getpelican.com" target="_blank">Pelican</a> - <a href="https://github.com/alexandrevicenzi/flex" target="_blank">Flex</a> theme by <a href="http://alexandrevicenzi.com" target="_blank">Alexandre Vicenzi</a></p>    </footer>
+  </main>
+
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BlogPosting",
+  "name": "Domain Coloring",
+  "headline": "Domain Coloring",
+  "datePublished": "2016-05-09 17:39:02-07:00",
+  "dateModified": "",
+  "author": {
+    "@type": "Person",
+    "name": "Roy Wiggins",
+    "url": "../author/roy-wiggins.html"
+  },
+  "image": "{{ SITEURL }}/{{ THEME_STATIC_DIR }}/img/profile.png",
+  "url": "../drafts/domain-coloring-.html",
+  "description": ""
+}
+</script>  
+  <script type="application/javascript" src="../theme/script/main.js"></script>
+</body>
+</html>

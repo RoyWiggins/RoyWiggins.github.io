@@ -1,135 +1,64 @@
-precision mediump float;
-#define PI 3.14159265359
+// Author: 
+// Title: 
+
+#ifdef GL_ES
+precision highp float;
+#endif
 #define PI2 6.28318530718
+#define PI 3.14159265359
 
-uniform vec2 u_resolution;
-uniform vec2 u_mouse;
-uniform float u_time;
-float zoom = 0.5;
-vec2 offset = vec2(0.5);
-
-mat3 rotationMatrix3(vec3 v, float angle)
-{  float c = cos(radians(angle));
-    float s = sin(radians(angle));
-    return mat3(c + (1.0 - c) * v.x * v.x, (1.0 - c) * v.x * v.y - s * v.z, (1.0 - c) * v.x * v.z + s * v.y,
-        (1.0 - c) * v.x * v.y + s * v.z, c + (1.0 - c) * v.y * v.y, (1.0 - c) * v.y * v.z - s * v.x,
-        (1.0 - c) * v.x * v.z - s * v.y, (1.0 - c) * v.y * v.z + s * v.x, c + (1.0 - c) * v.z * v.z
-        );
-}
-
-vec3 radius(vec2 c,float r1, float r2, float angle){
-    mat3 m =rotationMatrix3(vec3(0,0,1),angle);
-    c = (m * vec3(c,0)).xy;
-    return vec3( (smoothstep(r1,r1+.01, c.x) - smoothstep(r2,r2+.01,c.x) ) * 
-                   (smoothstep(-0.02,-0.01,c.y) - smoothstep(0.01,0.02,c.y) ));
-}
-void addColor(inout vec3 base, vec3 new, vec3 amt){
-    base = mix(base,new,amt);
-}
-vec3 circle(vec2 c, float r){
-    return vec3( smoothstep(0.,.01,length(c)-r+0.02)-smoothstep(0.,.01,length(c)-r-0.02));
-}
-vec3 circles(vec2 z,float r1,float r2){
-    vec3 col;
-    addColor(col,vec3(0,1,0),radius(z, r1,r2,0.));
-    addColor(col,vec3(0,0,1),radius(z, r1,r2,90.));
-    addColor(col,vec3(1,1,0),radius(z, r1,r2,180.));
-    addColor(col,vec3(1,0,1),radius(z, r1,r2,270.));
-    addColor(col,vec3(1,0.5,0.5),circle(z,r1));
-    addColor(col,vec3(1,0.5,0.5),circle(z,r2));
-    return col;
-}
-float cosh(float val)
-{
-    float tmp = exp(val);
-    float cosH = (tmp + 1.0 / tmp) / 2.0;
-    return cosH;
-}
-float tanh(float val)
-{
-    float tmp = exp(val);
-    float tanH = (tmp - 1.0 / tmp) / (tmp + 1.0 / tmp);
-    return tanH;
-}
-float sinh(float val)
-{
-    float tmp = exp(val);
-    float sinH = (tmp - 1.0 / tmp) / 2.0;
-    return sinH;
-}
-vec2 cMul(vec2 a, vec2 b) {
-    return vec2( a.x*b.x -  a.y*b.y,a.x*b.y + a.y * b.x);
-}
-vec2 cPower(vec2 z, float n) {
-    float r2 = dot(z,z);
-    return pow(r2,n/2.0)*vec2(cos(n*atan(z.y,z.x)),sin(n*atan(z.y,z.x)));
-}
-vec2 cInverse(vec2 a) {
-    return  vec2(a.x,-a.y)/dot(a,a);
-}
-vec2 cDiv(vec2 a, vec2 b) {
-    return cMul( a,cInverse(b));
-}
-vec2 cExp(in vec2 z){
-    return vec2(exp(z.x)*cos(z.y),exp(z.x)*sin(z.y));
-}
-vec2 cLog(vec2 a) {
-    float b =  atan(a.y,a.x);
-    if (b>0.0) b-=2.0*3.1415;
-    return vec2(log(length(a)),b);
-}
-vec2 cSqr(vec2 z) {
-    return vec2(z.x*z.x-z.y*z.y,2.*z.x*z.y);
-}
-vec2 cSin(vec2 z) {
-    return vec2(sin(z.x)*cosh(z.y), cos(z.x)*sinh(z.y));
-}
-vec2 cCos(vec2 z) {
-    return vec2(cos(z.x)*cosh(z.y), -sin(z.x)*sinh(z.y));
-}
-vec2 cPower2(vec2 z, vec2 a) {
-    return cExp(cMul(cLog(z), a));
-}
-
-
-vec3 hash3( vec2 p ){
-    vec3 q = vec3( dot(p,vec2(127.1,311.7)), 
-                   dot(p,vec2(269.5,183.3)), 
-                   dot(p,vec2(419.2,371.9)) );
-    return fract(sin(q)*43758.5453);
-}
-
-float iqnoise( in vec2 x, float u, float v ){
-//https://www.shadertoy.com/view/Xd23Dh
-    vec2 p = floor(x);
-    vec2 f = fract(x);
-
-    float k = 1.0+63.0*pow(1.0-v,4.0);
-
-    float va = 0.0;
-    float wt = 0.0;
-    for( int j=-2; j<=2; j++ )
-    for( int i=-2; i<=2; i++ )
-    {
-        vec2 g = vec2( float(i),float(j) );
-        vec3 o = hash3( p + g )*vec3(u,u,1.0);
-        vec2 r = g - f + o.xy;
-        float d = dot(r,r);
-        float ww = pow( 1.0-smoothstep(0.0,1.414,sqrt(d)), k );
-        va += o.z*ww;
-        wt += ww;
-    }
-
-    return va/wt;
-}
 vec3 hsv2rgb(vec3 c)
 {
     vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
     vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
     return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
-
-
+uniform vec2 u_resolution;
+uniform vec2 u_mouse;
+uniform float u_time;
+// Ray Marching Tutorial (With Shading)
+// By: Brandon Fogerty
+// bfogerty at gmail dot com
+// xdpixel.com
+ 
+// Ray Marching is a technique that is very similar to Ray Tracing.
+// In both techniques, you cast a ray and try to see if the ray intersects
+// with any geometry.  Both techniques require that geometry in the scene 
+// be defined using mathematical formulas.  However the techniques differ
+// in how the geometry is defined mathematically.  As for ray tracing,
+// we have to define geometry using a formula that calculates the exact
+// point of intersection.  This will give us the best visual result however
+// some types of geometry are very hard to define in this manner.
+// Ray Marching using distance fields to decribe geometry.  This means all
+// we need to know to define a kind of geometry is how to mearsure the distance
+// from any arbitrary 3d position to a point on the geometry.  We iterate or "march"
+// along a ray until one of two things happen.  Either we get a resulting distance
+// that is really small which means we are pretty close to intersecting with some kind
+// of geometry or we get a really huge distance which most likely means we aren't
+// going to intersect with anything.
+ 
+// Ray Marching is all about approximating our intersection point.  We can take a pretty
+// good guess as to where our intersection point should be by taking steps along a ray
+// and asking "Are we there yet?".  The benefit to using ray marching over ray tracing is
+// that it is generally much easier to define geometry using distance fields rather than
+// creating a formula to analytically find the intersection point.  Also, ray marching makes
+// certain effects like ambient occlusion almost free.  It is a little more work to compute
+// the normal for geometry.  I will cover more advanced effects using ray marching in a later tutorial.
+// For now,  we will simply ray march a scene that consists of a single sphere at the origin.
+// We will not bother performing any fancy shading to keep things simple for now.
+ 
+#ifdef GL_ES
+precision mediump float;
+#endif
+ 
+uniform vec2 resolution;
+ 
+//-----------------------------------------------------------------------------------------------
+// The sphere function takes in a point along the ray
+// we are marching and a radius.  The sphere function
+// will then return the distance from the input point p
+// to the closest point on the sphere.  The sphere is assumed
+// to be centered on the origin which is (0,0,0).
 float sphere( vec3 p, float radius )
 {
     return length( p ) - radius;
@@ -137,7 +66,9 @@ float sphere( vec3 p, float radius )
  
 //-----------------------------------------------------------------------------------------------
 // The map function is the function that defines our scene.
-
+// Here we can define the relationship between various objects
+// in our scene.  To keep things simple for now, we only have a single
+// sphere in our scene.
 float map( vec3 p )
 {    
     return sphere( p, 1.0 );
@@ -225,9 +156,20 @@ vec3 calculateLighting(vec3 pointOnSurface, vec3 surfaceNormal, vec3 lightPositi
  
     return finalColor;
 }
+ mat3 rotationMatrix3(vec3 v, float angle)
+{  float c = cos(radians(angle));
+    float s = sin(radians(angle));
+    return mat3(c + (1.0 - c) * v.x * v.x, (1.0 - c) * v.x * v.y - s * v.z, (1.0 - c) * v.x * v.z + s * v.y,
+        (1.0 - c) * v.x * v.y + s * v.z, c + (1.0 - c) * v.y * v.y, (1.0 - c) * v.y * v.z - s * v.x,
+        (1.0 - c) * v.x * v.z - s * v.y, (1.0 - c) * v.y * v.z + s * v.x, c + (1.0 - c) * v.z * v.z
+        );
+}
+vec3 domain(vec2 z){
+//    return vec3(smoothstep(0.999,1.01,length(z)/1.));
+    return vec3(hsv2rgb(vec3(atan(z.y,z.x)/PI2,1.,1.)));
+}
 
-
-vec2 projectToSphere(vec2 uv, out float distanceToClosestPointInScene){
+vec3 projectToSphere(vec2 uv){
     vec3 cameraPosition = vec3(0.,-10.026,10.260);
     
     // We will need to shoot a ray from our camera's position through each pixel.  To do this,
@@ -236,7 +178,36 @@ vec2 projectToSphere(vec2 uv, out float distanceToClosestPointInScene){
     vec3 cameraDirection = normalize( vec3( uv.x, uv.y, -10.0) );
     cameraDirection = cameraDirection * rotationMatrix3(vec3(1,0,0),44.);
     vec3 pointOnSurface;
-    distanceToClosestPointInScene = trace( cameraPosition, cameraDirection, pointOnSurface );
+    float distanceToClosestPointInScene = trace( cameraPosition, cameraDirection, pointOnSurface );
+    
     vec2 projected = pointOnSurface.xy / (1.-pointOnSurface.z);
-    return projected;
+
+    vec3 finalColor = vec3(0.0);
+    if( distanceToClosestPointInScene > 0.0 )
+    {
+/*        vec3 lightPosition = vec3( 0.0, -10.5, 20.0 );
+        vec3 surfaceNormal = getNormal( pointOnSurface );
+        finalColor = calculateLighting( pointOnSurface, surfaceNormal, lightPosition, cameraPosition, domain(projected) );
+*/
+        finalColor = domain(projected);
+    }
+/*    if( distanceToClosestPointInScene > 0.0 )
+    {
+    }*/
+    return finalColor;
+}
+
+//-----------------------------------------------------------------------------------------------
+// This is where everything starts!
+void main( void ) 
+{
+    vec2 uv = ( gl_FragCoord.xy / u_resolution.xy ) * 2.0 - 1.0;
+    
+ 
+    // We would like to cast a ray through each pixel on the screen.
+    // In order to use a ray, we need an origin and a direction.
+    // The cameraPosition is where we want our camera to be positioned.  Since our sphere will be
+    // positioned at (0,0,0), I will push our camera back by -10 units so we can see the sphere.
+
+    gl_FragColor = vec4( projectToSphere(uv) , 1.0 );
 }
