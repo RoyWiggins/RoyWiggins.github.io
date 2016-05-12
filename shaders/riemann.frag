@@ -53,12 +53,6 @@ precision mediump float;
  
 uniform vec2 resolution;
  
-//-----------------------------------------------------------------------------------------------
-// The sphere function takes in a point along the ray
-// we are marching and a radius.  The sphere function
-// will then return the distance from the input point p
-// to the closest point on the sphere.  The sphere is assumed
-// to be centered on the origin which is (0,0,0).
 float sphere( vec3 p, float radius )
 {
     return length( p ) - radius;
@@ -66,9 +60,7 @@ float sphere( vec3 p, float radius )
  
 //-----------------------------------------------------------------------------------------------
 // The map function is the function that defines our scene.
-// Here we can define the relationship between various objects
-// in our scene.  To keep things simple for now, we only have a single
-// sphere in our scene.
+
 float map( vec3 p )
 {    
     return sphere( p, 1.0 );
@@ -157,8 +149,8 @@ vec3 calculateLighting(vec3 pointOnSurface, vec3 surfaceNormal, vec3 lightPositi
     return finalColor;
 }
  mat3 rotationMatrix3(vec3 v, float angle)
-{  float c = cos(radians(angle));
-    float s = sin(radians(angle));
+{  float c = cos(angle);
+    float s = sin(angle);
     return mat3(c + (1.0 - c) * v.x * v.x, (1.0 - c) * v.x * v.y - s * v.z, (1.0 - c) * v.x * v.z + s * v.y,
         (1.0 - c) * v.x * v.y + s * v.z, c + (1.0 - c) * v.y * v.y, (1.0 - c) * v.y * v.z - s * v.x,
         (1.0 - c) * v.x * v.z - s * v.y, (1.0 - c) * v.y * v.z + s * v.x, c + (1.0 - c) * v.z * v.z
@@ -168,33 +160,22 @@ vec3 domain(vec2 z){
 //    return vec3(smoothstep(0.999,1.01,length(z)/1.));
     return vec3(hsv2rgb(vec3(atan(z.y,z.x)/PI2,1.,1.)));
 }
-
-vec3 projectToSphere(vec2 uv){
-    vec3 cameraPosition = vec3(0.,-10.026,10.260);
+vec2 cis(float a){
+    return vec2(cos(a),sin(a));
+}
+vec2 projectToSphere(vec2 uv, out float distanceToClosestPointInScene){
     
     // We will need to shoot a ray from our camera's position through each pixel.  To do this,
     // we will exploit the uv variable we calculated earlier, which describes the pixel we are
     // currently rendering, and make that our direction vector.
+    vec2 mouse_uv = ( u_mouse.xy / u_resolution.xy ) * 2.0 - 1.0;
+    vec3 cameraPosition = vec3(0.,15.*cis(mouse_uv.y*PI/2.));
     vec3 cameraDirection = normalize( vec3( uv.x, uv.y, -10.0) );
-    cameraDirection = cameraDirection * rotationMatrix3(vec3(1,0,0),44.);
+    cameraDirection = cameraDirection * rotationMatrix3(vec3(1,0,0),-atan(cameraPosition.y, cameraPosition.z));//PI/4.);
     vec3 pointOnSurface;
-    float distanceToClosestPointInScene = trace( cameraPosition, cameraDirection, pointOnSurface );
-    
+    distanceToClosestPointInScene = trace( cameraPosition, cameraDirection, pointOnSurface );
     vec2 projected = pointOnSurface.xy / (1.-pointOnSurface.z);
-
-    vec3 finalColor = vec3(0.0);
-    if( distanceToClosestPointInScene > 0.0 )
-    {
-/*        vec3 lightPosition = vec3( 0.0, -10.5, 20.0 );
-        vec3 surfaceNormal = getNormal( pointOnSurface );
-        finalColor = calculateLighting( pointOnSurface, surfaceNormal, lightPosition, cameraPosition, domain(projected) );
-*/
-        finalColor = domain(projected);
-    }
-/*    if( distanceToClosestPointInScene > 0.0 )
-    {
-    }*/
-    return finalColor;
+    return projected;
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -202,12 +183,11 @@ vec3 projectToSphere(vec2 uv){
 void main( void ) 
 {
     vec2 uv = ( gl_FragCoord.xy / u_resolution.xy ) * 2.0 - 1.0;
-    
- 
-    // We would like to cast a ray through each pixel on the screen.
-    // In order to use a ray, we need an origin and a direction.
-    // The cameraPosition is where we want our camera to be positioned.  Since our sphere will be
-    // positioned at (0,0,0), I will push our camera back by -10 units so we can see the sphere.
 
-    gl_FragColor = vec4( projectToSphere(uv) , 1.0 );
+    float dist;
+
+    vec2 z = projectToSphere(uv,dist);
+    if (dist > 0.){
+        gl_FragColor = vec4( domain(z) , 1.0 );
+    }
 }

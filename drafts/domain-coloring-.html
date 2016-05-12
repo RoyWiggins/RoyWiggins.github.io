@@ -22,7 +22,7 @@
 <meta name="description" content="" />
 <meta name="keywords" content="">
 <meta property="og:site_name" content="Roy.red"/>
-<meta property="og:title" content="Domain Coloring"/>
+<meta property="og:title" content="Drawing Fractal Droste images"/>
 <meta property="og:description" content=""/>
 <meta property="og:locale" content="en_US"/>
 <meta property="og:url" content="../drafts/domain-coloring-.html"/>
@@ -32,7 +32,7 @@
 <meta property="article:author" content="../author/roy-wiggins.html">
 <meta property="article:section" content="misc"/>
 <meta property="og:image" content="">
-  <title>Roy.red &ndash; Domain Coloring</title>
+  <title>Roy.red &ndash; Drawing Fractal Droste images</title>
 </head>
 <body>
   <aside>
@@ -57,11 +57,16 @@
 
 <article>
   <header>
-    <h1 id="domain-coloring">Domain Coloring</h1>
+    <h1 id="domain-coloring">Drawing Fractal Droste images</h1>
     <p>Posted on Mon 09 May 2016 in <a href="../category/misc.html">misc</a></p>
   </header>
   <div>
-    <p>To begin with, I'm going to talk about complex functions. Complex functions take a complex number as input and return another. It's a bit tricky to visualize them, since between the two-dimensional range and two-dimensional domain, the result is four-dimensional. A common method for visualizing these functions is domain coloring.</p>
+    <p><a href="https://www.flickr.com/photos/fpsurgeon/2680685329/in/pool-escherdroste"><img style="float: right;" width="300" src="../images/2droste.jpg"/></a></p>
+<p>When I was researching Droste images for a <a href="/droste-.html">previous post</a>, I occasionally came across strange versions which depicted multiple spirals, rather than the customary single spiral, like this one by David Pearson. This led me down a rabbit hole to understand what is actually going on in these images, and to see what I could make with the effect. </p>
+<p>This is going to be a longer post, so feel free to scroll to the end to see the final fractal results. Spoiler alert: Mandelbrots.</p>
+<div style='clear:right'></div>
+
+<p>To begin with, I'm going to talk about complex functions. Complex functions take a complex number as input and return another. It's a bit tricky to visualize them, since between the two-dimensional range and two-dimensional domain, the result is four-dimensional. A common method for visualizing these functions is domain coloring.</p>
 <div class="codeAndCanvas" data="vec3 domain(vec2 z){
     return vec3(hsv2rgb(vec3(atan(z.y,z.x)/PI2,1.,1.)));
 }
@@ -69,8 +74,8 @@ vec3 color(vec2 z) {
     return domain(z);
 }"></div>
 
-<p>The idea behind domain coloring is that you draw a picture of a complex function <span class="math">\(f: \mathbb{ C } \mapsto \mathbb{ C }\)</span> by coloring the domain and pulling those colors back by <span class="math">\(f\)</span>. In other words you color <span class="math">\(z\)</span> the same as <span class="math">\(f(z)\)</span> is colored. The particular method I'm using is called a phase diagram, (TODO). It colors the domain by the phase, or the angle it makes with the positive real axis. </p>
-<p>In the example above, I'm just drawing the domain with no complex function at all (or, if you like, the identity <span class="math">\(f: z \mapsto z\)</span>). Notice that it's very obvious where 0 is, because the colors all "bunch up" around it. We'll see a similar effect near the zeros of a more complicated function. Here is the phase plot for <span class="math">\(f: z \mapsto z / (z^2 + z + 1)\)</span>. </p>
+<p>The idea behind domain coloring is that you draw a picture of a complex function <span class="math">\(f: \mathbb{ C } \mapsto \mathbb{ C }\)</span> by coloring the domain and pulling those colors back by <span class="math">\(f\)</span>. In other words you color <span class="math">\(z\)</span> the same as <span class="math">\(f(z)\)</span> is colored. The particular method I'm using is called a phase portrait, borrowed from Elias Wegert. It colors the domain by the phase, or the angle it makes with the positive real axis. See <a href="http://www.ams.org/notices/201106/rtx110600768p.pdf">A Journey in Illustration</a></p>
+<p>In the example above, I'm just drawing the domain with no complex function at all (or, if you like, the identity <span class="math">\(f: z \mapsto z\)</span>). Notice that it's very obvious where <span class="math">\(0\)</span> is, because the colors all "bunch up" around it. We'll see a similar effect near the zeros of a more complicated function. Here is the phase portrait for <span class="math">\(f: z \mapsto z / (z^2 + z + 1)\)</span>. </p>
 <div class="codeAndCanvas" data="vec3 domain(vec2 z){
     return vec3(hsv2rgb(vec3(atan(z.y,z.x)/PI2,1.,1.)));
 }
@@ -87,46 +92,159 @@ vec3 color(vec2 z) {
     return vec3(hsv2rgb(vec3(atan(z.y,z.x)/PI2,1.,1.)));
 }
 vec3 color(vec2 z) {
-    float dist;
-    z = projectToSphere(z,dist);
-    if (dist > 0.){
-        return domain(z);
-    }
+    float onSphere;
+    // sphereViewer textures a sphere by stereographic projection
+    z = sphereViewer(z,onSphere); 
+    if (onSphere > 0.)
+        // Color this part of the sphere by its projection
+        return domain(z)-circle(z,.5);
     return vec3(0);
 }"></div>
 
 <div style='clear:right'></div>
 
-<div class="codeAndCanvas" data="vec2 f(vec2 z,vec2 c){    
-    z = cPower2(z,vec2(2.,0));
-    return z = z+c;
+<p>On the sphere above, I've drawn a circle with radius <span class="math">\(0.5\)</span> to help orient us; it gets projected to the lower hemisphere. Wave your mouse cursor over the sphere to tip it up and down. (The sphere is <a href="http://9bitscience.blogspot.com/2013/07/raymarching-distance-fields_14.html">raymarched</a> based on <a href="http://glslsandbox.com/e#29798.0">this code</a>)</p>
+<p>The next step is to note that a logarithmic spiral projected back onto the sphere is a loxodrome, or rhumb line. Luckily for us, it's easy to generate one: a circle transformed by the droste effect is a logarithmic spiral. Let's superimpose that on our domain coloring to see how it looks on the sphere. </p>
+<div class="codeAndCanvas" data="vec3 domain(vec2 z){
+    // r1=0.7, r2=1.4:
+    z = droste_(z,0.7,1.4);
+    return circle(z,1.)+vec3(hsv2rgb(vec3(atan(z.y,z.x)/PI2,1.,1.)));
+}
+vec3 color(vec2 z) {
+    float onSphere;
+    z = sphereViewer(z,onSphere); 
+    if (onSphere > 0.)
+        return domain(z);
+    return vec3(0);
+}"></div>
+
+<p>The awesome thing here is that we have a smooth spiral that is (roughly speaking) symmetrical across the equator. If we leave this spiral in our domain coloring, we will get smooth spirals around the zeros and poles of the phase portrait. So far as I know, this is actually a new (or at least rarely used) way to visualize complex functions.</p>
+<div class="codeAndCanvas" data="vec3 domain(vec2 z){
+    z = droste_(z,0.7,1.4);
+    return circle(z,1.)+phase_portrait(z);
+}
+vec2 f(vec2 z){
+    z = z * 2.;
+    return cDiv(z-vec2(1.,0), cMul(z,z)+z+vec2(1.,0));
+}
+vec3 color(vec2 z) {
+    return domain(f(z));
+}"></div>
+
+<p>The big reveal here is, we're not just working with logarithmic spirals. We're working with the droste effect! So we can draw a complicated Droste image in the domain and it will behave in a similar way. </p>
+<div class="codeAndCanvas" data="vec3 domain(vec2 z){
+    z = droste_(z,0.5,1.0);
+    return planetaryLinkage(z);
+}
+vec2 f(vec2 z){
+    z = z * 2.;
+    return cDiv(z-vec2(1.,0), cMul(z,z)+z+vec2(1.,0));
+}
+vec3 color(vec2 z) {
+    //float onSphere;
+    //z = sphereViewer(z,onSphere); 
+    //if (onSphere > 0.)
+    return domain(f(z));
+    //return vec3(0);
+}"></div>
+
+<p>To draw the two-spiral effect that we saw in the original image, we transform the domain with a <a href="https://en.wikipedia.org/wiki/M%C3%B6bius_transformation">Möbius transformation</a> <span class="math">\(z \mapsto \frac{z-1}{z+1}\)</span>. Notice that this function has one zero at <span class="math">\(z=1\)</span> (the numerator is <span class="math">\(0\)</span>) and a pole at <span class="math">\(z=-1\)</span> (the denominator is <span class="math">\(0\)</span>). This is equivalent, as you can see, to tipping the Riemann sphere sideways by 90 degrees. </p>
+<div class="codeAndCanvas" data="vec3 domain(vec2 z){
+    z = droste_(z,0.7,1.4);// r1=0.7, r2=1.4:
+    return circle(z,1.)+phase_portrait(z);
+}
+vec2 f(vec2 z){
+    return cDiv(z+vec2(-1,0),z+vec2(1,0));
+}
+vec3 color(vec2 z) {
+    float onSphere; z = sphereViewer(z,onSphere); 
+    return onSphere>0.? domain(f(z)): vec3(0);
+}"></div>
+
+<p>The result applied to our droste domain is more or less similar to the two-spiraled effect that we wanted to emulate in the first place. </p>
+<div style='clear:right'></div>
+
+<div class="codeAndCanvas" data="vec3 domain(vec2 z){
+    z = droste_(z,0.5,1.0);
+    return planetaryLinkage(z);
+}
+vec2 f(vec2 z){
+    return cDiv(z+vec2(-1,0),z+vec2(1,0));
+}
+vec3 color(vec2 z) {
+    return domain(f(2.*z));
+}"></div>
+
+<p>From here, there's any number of complex functions we could play with. Elias Wegert's <a href="http://www.mathe.tu-freiberg.de/~wegert/PhasePlot/images.html">phase plot gallery</a> gives a sense of the variety. I decided to draw a Mandelbrot / Julia set. </p>
+<p>The simplest method to draw a Mandelbrot image is to iterate each point <span class="math">\(z_0\)</span> through the Mandelbrot function <span class="math">\(m(z) = z^2 + z_0\)</span> until it escapes (or doesn't) and then coloring the pixel accordingly, giving up at some large number of iterations. Instead, we're just going to apply the function <span class="math">\(n\)</span> times and ignore whether it's escaping or not, to produce a function <span class="math">\(M_n\)</span>. Here I draw <span class="math">\(M_3\)</span>:</p>
+<div class="codeAndCanvas" data="vec2 M(vec2 z,vec2 c){    
+    // Iterate m(z) 3 times
+    for (int i=0; i<3;i++){
+        z = cPower(z,2.) + c;
+    } return z;
 }
 vec3 domain(vec2 z){
-    float r1 = 0.2; float r2 = 1.0;
-    // 4. Take the tiled strips back to ordinary space.
-    z = cLog(z);
-    // 3. Scale and rotate the strips
-    float scale = log(r2/r1);
-    float angle = atan(scale/(2.0*PI));
-    z = cDiv(z, cExp(vec2(0,angle))*cos(angle)); 
-    // 2. Tile the strips
-    z.x = mod(z.x,scale);
-    // 1. Take the annulus to a strip
-    z = cExp(z)*r1;
-    return circles(z,r1,r2);
+    //return phase_portrait(z);
+    z = droste_(z,0.5,1.0);
+    return planetaryLinkage(z);
 }
-
 vec3 color(vec2 z) {
-    float dist=1.;
-    z = z * 2.;
-    vec2 z0 = z;   
-    for (int i=0; i<3;i++){
-        z = f(z,z0);
-    }
-    z = cDiv((z+vec2(-1,0.000)),(z-vec2(-1.,-0.00)));       
+    vec2 z0 = (z = z*2.-vec2(0.5,0.));
+    z = M(z,z0);
     return domain(z);
 }"></div>
 
+<p>This produces an interesting result, but I found that applying the Mobius transformation I used before produces a more satisfying picture. This is because the <span class="math">\(M_n\)</span> function (in the limit) maps the interior of the Mandelbrot set onto the unit disk. Placing the top and bottom of the loxodrome on the unit circle means that the "interesting" parts of the domain get mapped to somewhere near the boundary. </p>
+<p>Instead of tipping the whole domain, you can just shift the top pole to the unit circle and leave the zero alone with <span class="math">\(z \mapsto \frac{z}{z+1}\)</span>. It produces better results for slightly higher values of <span class="math">\(n\)</span>, because it's drawing spirals between the boundary of the Mandelbrot and the zeros in the interior. Try experimenting with this here, and above to see what it does to the Riemann sphere.</p>
+<div class="codeAndCanvas" data="vec2 M(vec2 z,vec2 c){    
+    for (int i=0; i<5;i++){
+        z = cPower(z,2.) + c;
+    } return z;
+}
+vec3 domain(vec2 z){
+    float shade = 1.2-1.2*dot(z,z);
+    z = cDiv((z+vec2(-1,0.000)),(z+vec2(1.0,0.00)));
+    //z = cDiv(z-cis(u_time),(z+cis(u_time))); //rotations
+    //z = cDiv(z,(z+vec2(1.0,0.0))); //squash-tipping
+    //return phase_portrait(z)*shade;
+    z = droste_(z,0.5,1.0);
+    return planetaryLinkage(z)*shade;
+}
+vec3 color(vec2 z) {
+    z = z*1.2-vec2(0.5,0.);
+    vec2 z0 = z;
+    z = M(z,z0);
+    return domain(z);
+}"></div>
+
+<hr />
+<p>And finally, here's an interactive animation of the Julia set; it alters the parameter <span class="math">\(c\)</span> based on mouse movement. There is also <a href="/julia-view.html">a version listing the full source code</a> rather than the abbreviated code displayed so far. </p>
+<div class="codeAndCanvas extrabig" data="vec2 M(vec2 z,vec2 c){    
+    for (int i=0; i<6;i++){
+        z = cPower(z,2.) + c;
+    } return z;
+}
+vec3 domain(vec2 z){
+    float shade = 1.23-.8*length(z);
+    //return phase_portrait(z)*shade;
+    z = droste_(z,0.5,1.0);
+    return planetaryLinkage(z)*shade;
+}
+vec3 color(vec2 z) {
+    vec2 c = mouse_uv();
+    //vec2 c = vec2(-0.580,0.460)+cis(u_time)/10.;
+    z = M(z*1.5,c);
+    return domain(z);
+}"></div>
+
+<h3>Further reading</h3>
+<ul>
+<li><a href="https://westy31.home.xs4all.nl/Geometry/Geometry.html#Fractal_tiling">Platonic tilings of Riemann surfaces</a></li>
+<li><a href="http://www.malinc.se/m/">Malin Christerrson</a></li>
+<li><a href="http://www.mathe.tu-freiberg.de/~wegert/visual/index.htm">Elias Wegert</a></li>
+<li><a href="http://www.dhushara.com/DarkHeart/DarkHeart.htm">Exploding the Dark Heart of Chaos</a></li>
+<li><a href="http://archive.bridgesmathart.org/2013/bridges2013-217.pdf">The Mercator Redemption</a></li>
+</ul>
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "center",
         indent = "0em",
@@ -204,8 +322,8 @@ vec3 color(vec2 z) {
 {
   "@context": "http://schema.org",
   "@type": "BlogPosting",
-  "name": "Domain Coloring",
-  "headline": "Domain Coloring",
+  "name": "Drawing Fractal Droste images",
+  "headline": "Drawing Fractal Droste images",
   "datePublished": "2016-05-09 17:39:02-07:00",
   "dateModified": "",
   "author": {

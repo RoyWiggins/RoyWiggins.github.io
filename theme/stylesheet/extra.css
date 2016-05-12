@@ -6,6 +6,14 @@
 		top:0px !important;
 	}
 }
+
+.extrabig > canvas.ge_canvas {
+	float:none !important; 
+	width:50%;
+	margin-left:25%;
+	top:0px !important;
+}
+
 canvas.ge_canvas{
 	margin-bottom:0.5em;
 }

@@ -8,6 +8,10 @@ uniform float u_time;
 float zoom = 0.5;
 vec2 offset = vec2(0.5);
 
+vec3 smoothstepr(float center, float width, vec3 value){
+    return smoothstep(center-width/2.,center+width/2.,value);
+}
+
 mat3 rotationMatrix3(vec3 v, float angle)
 {  float c = cos(radians(angle));
     float s = sin(radians(angle));
@@ -15,6 +19,14 @@ mat3 rotationMatrix3(vec3 v, float angle)
         (1.0 - c) * v.x * v.y + s * v.z, c + (1.0 - c) * v.y * v.y, (1.0 - c) * v.y * v.z - s * v.x,
         (1.0 - c) * v.x * v.z - s * v.y, (1.0 - c) * v.y * v.z + s * v.x, c + (1.0 - c) * v.z * v.z
         );
+}
+void rotate(inout vec2 c, float angle){
+    mat3 m =rotationMatrix3(vec3(0,0,1),angle);
+    c = (m * vec3(c,0)).xy;
+}
+vec2 rotate2(in vec2 c, float angle){
+    mat3 m =rotationMatrix3(vec3(0,0,1),angle);
+    return (m * vec3(c,0)).xy;
 }
 
 vec3 radius(vec2 c,float r1, float r2, float angle){
@@ -29,6 +41,7 @@ void addColor(inout vec3 base, vec3 new, vec3 amt){
 vec3 circle(vec2 c, float r){
     return vec3( smoothstep(0.,.01,length(c)-r+0.02)-smoothstep(0.,.01,length(c)-r-0.02));
 }
+
 vec3 circles(vec2 z,float r1,float r2){
     vec3 col;
     addColor(col,vec3(0,1,0),radius(z, r1,r2,0.));
@@ -39,6 +52,10 @@ vec3 circles(vec2 z,float r1,float r2){
     addColor(col,vec3(1,0.5,0.5),circle(z,r2));
     return col;
 }
+vec3 filledcircle(vec2 c, float r){
+    return vec3( 1.0-smoothstep(0.,.01,length(c)-r-0.02));
+}
+
 float cosh(float val)
 {
     float tmp = exp(val);
@@ -56,6 +73,9 @@ float sinh(float val)
     float tmp = exp(val);
     float sinH = (tmp - 1.0 / tmp) / 2.0;
     return sinH;
+}
+vec2 cis(float a){
+    return vec2(cos(a),sin(a));
 }
 vec2 cMul(vec2 a, vec2 b) {
     return vec2( a.x*b.x -  a.y*b.y,a.x*b.y + a.y * b.x);
@@ -89,6 +109,9 @@ vec2 cCos(vec2 z) {
 }
 vec2 cPower2(vec2 z, vec2 a) {
     return cExp(cMul(cLog(z), a));
+}
+vec2 cConj(vec2 z) {
+    return vec2(z.x,-z.y);
 }
 
 
@@ -186,13 +209,7 @@ float trace( vec3 origin, vec3 direction, out vec3 p )
         {
             break;
         }
- 
-        // If on the other hand our totalDistanceTraveled is a really huge distance,
-        // we are probably marching along a ray pointing to empty space.  Again,
-        // to improve performance,  we should just exit early.  We really only want
-        // the trace function to tell us how far we have to march along our ray
-        // to intersect with some geometry.  In this case we won't intersect with any
-        // geometry so we will set our totalDistanceTraveled to 0.00. 
+
         if( totalDistanceTraveled > 10000.0 )
         {
             totalDistanceTraveled = 0.0000;
@@ -203,9 +220,7 @@ float trace( vec3 origin, vec3 direction, out vec3 p )
     return totalDistanceTraveled;
 }
  
-//-----------------------------------------------------------------------------------------------
 // Standard Blinn lighting model.
-// This model computes the diffuse and specular components of the final surface color.
 vec3 calculateLighting(vec3 pointOnSurface, vec3 surfaceNormal, vec3 lightPosition, vec3 cameraPosition,vec3 diff)
 {
     vec3 fromPointToLight = normalize(lightPosition - pointOnSurface);
@@ -226,17 +241,75 @@ vec3 calculateLighting(vec3 pointOnSurface, vec3 surfaceNormal, vec3 lightPositi
     return finalColor;
 }
 
-
-vec2 projectToSphere(vec2 uv, out float distanceToClosestPointInScene){
-    vec3 cameraPosition = vec3(0.,-10.026,10.260);
+vec2 sphereViewer(vec2 uv, out float distanceToClosestPointInScene){
     
     // We will need to shoot a ray from our camera's position through each pixel.  To do this,
     // we will exploit the uv variable we calculated earlier, which describes the pixel we are
     // currently rendering, and make that our direction vector.
+    vec2 mouse_uv = ( u_mouse.xy / u_resolution.xy ) * 2.0 - 1.0;
+    vec3 cameraPosition = vec3(0.,-15.*cis(mouse_uv.y*PI/2.));
     vec3 cameraDirection = normalize( vec3( uv.x, uv.y, -10.0) );
-    cameraDirection = cameraDirection * rotationMatrix3(vec3(1,0,0),44.);
+    cameraDirection = cameraDirection * rotationMatrix3(vec3(1,0,0),degrees(-atan(cameraPosition.y, cameraPosition.z)));
     vec3 pointOnSurface;
     distanceToClosestPointInScene = trace( cameraPosition, cameraDirection, pointOnSurface );
     vec2 projected = pointOnSurface.xy / (1.-pointOnSurface.z);
     return projected;
+}
+vec2 droste_(vec2 z,float r1, float r2) {
+    z = cLog(z);
+    float scale = log(r2/r1);
+    float angle = atan(scale/(2.0*PI));
+    z = cDiv(z, cExp(vec2(0,angle))*cos(angle)); 
+    z.x = mod(z.x,scale);
+    z = cExp(z)*r1;
+    return z;
+}
+
+// ---------
+vec3 smoothgear(in vec3 col, vec2 z, float r, float n, float toothHeight){
+    float theta = atan(z.y,z.x);
+    float R = length(z)-r-toothHeight/5.;
+    float val;
+    val = 1.0 - smoothstep(0.,0.01,sin(R)+sin(theta*n)*toothHeight/2.);
+    val = val+smoothstepr(R-toothHeight/5.,0.01,vec3(0.)).x-1. ;
+    val = clamp(val,0.,1.);
+    val = val+smoothstepr(R+toothHeight/5.,0.01,vec3(0.)).x ;
+    return vec3(clamp(val,0.,1.));
+}
+vec3 planetGear(in vec3 col, in vec2 z, float sunRadius, float planetRadius,float planetTeeth,float carrierSpeed, float planetSpeed, float stime, float angle){
+    return smoothgear(col,rotate2(rotate2(z,angle+stime*carrierSpeed)-vec2(sunRadius+planetRadius,0),-(stime+angle) * planetSpeed),planetRadius,planetTeeth,0.13);
+}
+vec3 planetaryLinkage(vec2 z){
+    vec3 col;
+    float r1 = 0.5;
+    float r2 = 1.;
+    float secondsPerRotation = 40.;
+    float stime = 360. * u_time/secondsPerRotation;
+    float sunTeeth = 30.;
+    float planetTeeth = 8.;
+    float annulusTeeth = 40.;
+
+    float sunToothHeight = 0.1;
+    float sunRadius = r1+sunToothHeight;
+    float carrierSpeed = 4.;    
+    float planetSpeed =  annulusTeeth/planetTeeth * carrierSpeed;
+    float sunSpeed = (1.+annulusTeeth/sunTeeth)*carrierSpeed;
+    float planetRadius = (r2-sunRadius-0.1)/2.;
+    float nPlanets = 10.;
+
+    z = rotate2(z,-stime*1.5);
+    vec3 annulusColor = vec3(1.,.1,.1);
+    addColor(col,annulusColor,vec3(1)-smoothgear(col,rotate2(z,  0.),sunRadius+planetRadius+sunToothHeight*2.,annulusTeeth,0.1));
+    addColor(col,annulusColor,smoothgear(col,rotate2(z,  stime*sunSpeed),sunRadius,sunTeeth,sunToothHeight*1.5));
+
+    for( float x = 0.; x<360.; x += 36.){
+        addColor(col,vec3(0.925,0.701,0.),planetGear(col,z,sunRadius+0.061,planetRadius-0.018,planetTeeth,carrierSpeed,planetSpeed,stime,x));
+    }
+    return col;
+}
+vec2 mouse_uv(){
+        return ( u_mouse.xy / u_resolution.xy ) * 2.0 - 1.0;
+}
+vec3 phase_portrait(vec2 z){
+    return vec3(hsv2rgb(vec3(atan(z.y,z.x)/PI2,1.,1.)));
 }
