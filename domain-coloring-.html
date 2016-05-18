@@ -200,7 +200,7 @@ vec3 color(vec2 z) {
     } return z;
 }
 vec3 domain(vec2 z){
-    float shade = 1.2-1.2*dot(z,z);
+    float shade = 0.5-1.*(dot(z,z)-.7);
     z = cDiv((z+vec2(-1,0.000)),(z+vec2(1.0,0.00)));
     //z = cDiv(z-cis(u_time),(z+cis(u_time))); //rotations
     //z = cDiv(z,(z+vec2(1.0,0.0))); //squash-tipping
@@ -224,7 +224,7 @@ vec3 color(vec2 z) {
     } return z;
 }
 vec3 domain(vec2 z){
-    float shade = 1.23-.8*length(z);
+    float shade = 0.5-1.*(dot(z,z)-.7);
     //return phase_portrait(z)*shade;
     z = droste_(z,0.5,1.0);
     return planetaryLinkage(z)*shade;
