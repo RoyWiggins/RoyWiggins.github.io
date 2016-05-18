@@ -18,9 +18,10 @@ canvas.ge_canvas{
 	margin-bottom:0.5em;
 }
 
-article {
-	overflow: auto;
-}
 .ge_export_icon {
 	visibility: hidden;
+}
+
+aside nav ul li {
+	text-transform: none;
 }
