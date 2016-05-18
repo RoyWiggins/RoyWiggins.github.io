@@ -113,7 +113,7 @@ vec3 color(vec2 z) {
 vec3 color(vec2 z) {
     float onSphere;
     z = sphereViewer(z,onSphere); 
-    return onSphere>0.? domain(f(z)): vec3(0);
+    return onSphere>0.? domain(z): vec3(0);
 }"></div>
 
 <p>The awesome thing here is that we have a smooth spiral that is (roughly speaking) symmetrical across the equator. If we leave this spiral in our domain coloring, we will get smooth spirals around the zeros and poles of the phase portrait. So far as I know, this is actually a new (or at least rarely used) way to visualize complex functions.</p>
