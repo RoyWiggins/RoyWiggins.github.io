@@ -87,7 +87,7 @@ vec3 color(vec2 z) {
 
 <p>Something funny's happening. There's three zero-like regions, but the two on the left are different- if you follow the hues around in a circle, they are cycling the "wrong way". They're not zeros at all, but poles: the center of these regions is where <span class="math">\(f\)</span> goes to infinity. You can't explain this easily without invoking the Riemann sphere, which is much less intimidating than it sounds. </p>
 <p><center><img width="60%" src="http://upload.wikimedia.org/wikipedia/commons/7/7c/Riemann_sphere1.jpg"/></center></p>
-<p>Thankfully, the Riemann sphere is a simple idea. Imagine that the complex plane is actually sitting in 3D space. If you place a sphere at the origin, you can <a href="">stereographically project</a> points on the plane (complex numbers) to the sphere and back again, by casting a ray out from the top of the sphere. The lower hemisphere is identified with the unit disk, while the northern upper is identified with the entire rest of the plane. An ant that lives on the complex plane that starts at the origin, can march outwards and the further it goes, the further its twin on the sphere approaches the north pole. If we map our domain coloring to the Riemann sphere, the colors get "gathered together" at the top of the sphere, which is why they gather together around infinities as well. </p>
+<p>Imagine that the complex plane is actually sitting in 3D space. If you place a sphere at the origin, you can <a href="">stereographically project</a> points on the plane (complex numbers) to the sphere and back again, by casting a ray out from the top of the sphere. The lower hemisphere is identified with the unit disk, while the northern upper is identified with the entire rest of the plane. This is the Riemann sphere. An ant that lives on the complex plane that starts at the origin, can march outwards and the further it goes, the further its twin on the sphere approaches the north pole. If we map our domain coloring to the Riemann sphere, the colors get "gathered together" at the top of the sphere, which is why they gather together around infinities as well. </p>
 <div class="codeAndCanvas" data="vec3 domain(vec2 z){
     return vec3(hsv2rgb(vec3(atan(z.y,z.x)/PI2,1.,1.)));
 }
@@ -104,7 +104,7 @@ vec3 color(vec2 z) {
 <div style='clear:right'></div>
 
 <p>On the sphere above, I've drawn a circle with radius <span class="math">\(0.5\)</span> to help orient us; it gets projected to the lower hemisphere. Wave your mouse cursor over the sphere to tip it up and down. (The sphere is <a href="http://9bitscience.blogspot.com/2013/07/raymarching-distance-fields_14.html">raymarched</a> based on <a href="http://glslsandbox.com/e#29798.0">this code</a>)</p>
-<p>The next step is to note that a logarithmic spiral projected back onto the sphere is a loxodrome, or rhumb line. Luckily for us, it's easy to generate one: a circle transformed by the droste effect is a logarithmic spiral. Let's superimpose that on our domain coloring to see how it looks on the sphere. </p>
+<p>The next step is to note that a logarithmic spiral projected back onto the sphere is a <a href="https://en.wikipedia.org/wiki/Rhumb_line">loxodrome</a>, or rhumb line. This is caused by the logarithmic spiral being also "equiangular": at every point, if you draw a circle centered at the origin that goes through it, the tangent will always make the same angle with the circle. Under stereographic projection, that circle becomes a <a href="https://en.wikipedia.org/wiki/Latitude">parallel</a>. Luckily for us, it's easy to generate one: a circle transformed by the droste effect is a logarithmic spiral. Let's superimpose that on our domain coloring to see how it looks on the sphere. </p>
 <div class="codeAndCanvas" data="vec3 domain(vec2 z){
     // r1=0.7, r2=1.4:
     z = droste_(z,0.7,1.4);
@@ -113,9 +113,7 @@ vec3 color(vec2 z) {
 vec3 color(vec2 z) {
     float onSphere;
     z = sphereViewer(z,onSphere); 
-    if (onSphere > 0.)
-        return domain(z);
-    return vec3(0);
+    return onSphere>0.? domain(f(z)): vec3(0);
 }"></div>
 
 <p>The awesome thing here is that we have a smooth spiral that is (roughly speaking) symmetrical across the equator. If we leave this spiral in our domain coloring, we will get smooth spirals around the zeros and poles of the phase portrait. So far as I know, this is actually a new (or at least rarely used) way to visualize complex functions.</p>
@@ -148,7 +146,7 @@ vec3 color(vec2 z) {
     //return vec3(0);
 }"></div>
 
-<p>To draw the two-spiral effect that we saw in the original image, we transform the domain with a <a href="https://en.wikipedia.org/wiki/M%C3%B6bius_transformation">Möbius transformation</a> <span class="math">\(z \mapsto \frac{z-1}{z+1}\)</span>. Notice that this function has one zero at <span class="math">\(z=1\)</span> (the numerator is <span class="math">\(0\)</span>) and a pole at <span class="math">\(z=-1\)</span> (the denominator is <span class="math">\(0\)</span>). This is equivalent, as you can see, to tipping the Riemann sphere sideways by 90 degrees. </p>
+<p>To draw the two-spiral effect that we saw in the original image, we transform the domain with a <a href="https://en.wikipedia.org/wiki/M%C3%B6bius_transformation">Möbius transformation</a> <span class="math">\(z \mapsto \frac{z-1}{z+1}\)</span>. Notice that this function has one zero at <span class="math">\(z=1\)</span> (the numerator is <span class="math">\(0\)</span>) and a pole at <span class="math">\(z=-1\)</span> (the denominator is <span class="math">\(0\)</span>). This is equivalent, as you can see, to <a href="https://www.youtube.com/watch?v=JX3VmDgiFnY">tipping</a> the Riemann sphere sideways by 90 degrees. </p>
 <div class="codeAndCanvas" data="vec3 domain(vec2 z){
     z = droste_(z,0.7,1.4);// r1=0.7, r2=1.4:
     return circle(z,1.)+phase_portrait(z);
