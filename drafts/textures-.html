@@ -23,17 +23,17 @@
 <meta name="description" content="" />
 <meta name="keywords" content="">
 <meta property="og:site_name" content="Roy.red"/>
-<meta property="og:title" content="Hello world"/>
+<meta property="og:title" content="Test"/>
 <meta property="og:description" content=""/>
 <meta property="og:locale" content="en_US"/>
-<meta property="og:url" content="http://roy.red/drafts/hello-world-.html"/>
+<meta property="og:url" content="http://roy.red/drafts/textures-.html"/>
 <meta property="og:type" content="article"/>
-<meta property="article:published_time" content="2016-04-02 18:40:03-07:00"/>
+<meta property="article:published_time" content="2016-05-31 23:47:34-07:00"/>
 <meta property="article:modified_time" content=""/>
 <meta property="article:author" content="http://roy.red/author/roy-wiggins.html">
 <meta property="article:section" content="misc"/>
 <meta property="og:image" content="">
-  <title>Roy.red &ndash; Hello world</title>
+  <title>Roy.red &ndash; Test</title>
 </head>
 <body>
   <aside>
@@ -58,11 +58,27 @@
 
 <article>
   <header>
-    <h1 id="hello-world">Hello world</h1>
-    <p>Posted on Sat 02 April 2016 in <a href="http://roy.red/category/misc.html">misc</a></p>
+    <h1 id="textures">Test</h1>
+    <p>Posted on Tue 31 May 2016 in <a href="http://roy.red/category/misc.html">misc</a></p>
   </header>
   <div>
-    <p>Hello world.</p>
+    <div class="codeAndCanvas extrabig" data-textures="/images/earth.jpg,/images/pano1.jpg,/images/pano2.jpg,/images/pano3.jpg,/images/pano4.jpg" data="
+vec2 unproject(vec2 z){
+    float longitude = 1.-(atan(z.y,z.x)+PI)/(2.*PI);
+    float latitude = 1.-2.*atan(1./length(z))/PI;
+    return vec2(longitude,latitude);
+}
+vec3 domain(vec2 z){
+    // r1=0.7, r2=1.4:
+    //z = droste_(z,0.7,1.4);
+    z = unproject(z);
+    return texture2D(u_tex0,z).xyz;
+}
+vec3 color(vec2 z) {
+    float onSphere;
+    z = sphereViewer(z,onSphere); 
+    return onSphere>0.? domain(z): vec3(0);
+}"></div>
   </div>
   <div class="tag-cloud">
     <p>
@@ -83,9 +99,9 @@
 {
   "@context": "http://schema.org",
   "@type": "BlogPosting",
-  "name": "Hello world",
-  "headline": "Hello world",
-  "datePublished": "2016-04-02 18:40:03-07:00",
+  "name": "Test",
+  "headline": "Test",
+  "datePublished": "2016-05-31 23:47:34-07:00",
   "dateModified": "",
   "author": {
     "@type": "Person",
@@ -93,7 +109,7 @@
     "url": "http://roy.red/author/roy-wiggins.html"
   },
   "image": "{{ SITEURL }}/{{ THEME_STATIC_DIR }}/img/profile.png",
-  "url": "http://roy.red/drafts/hello-world-.html",
+  "url": "http://roy.red/drafts/textures-.html",
   "description": ""
 }
 </script>  

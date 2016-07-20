@@ -3,14 +3,15 @@
 <head>
   <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic' rel='stylesheet' type='text/css'>
 
-    <link rel="stylesheet" type="text/css" href="./theme/stylesheet/style.min.css">
-    <link rel="stylesheet" type="text/css" href="./theme/stylesheet/extra.css">
-  <link rel="stylesheet" type="text/css" href="./theme/stylesheet/pygments.min.css">
-  <link rel="stylesheet" type="text/css" href="./theme/stylesheet/font-awesome.min.css">
-    <link type="text/css" rel="stylesheet" href="./theme/stylesheet/glslEditor.css">
-    <script type="application/javascript" src="./theme/script/glslEditor.js"></script>
+    <link rel="stylesheet" type="text/css" href="http://roy.red/theme/stylesheet/style.min.css">
+    <link rel="stylesheet" type="text/css" href="http://roy.red/theme/stylesheet/extra.css">
+  <link rel="stylesheet" type="text/css" href="http://roy.red/theme/stylesheet/pygments.min.css">
+  <link rel="stylesheet" type="text/css" href="http://roy.red/theme/stylesheet/font-awesome.min.css">
+    <link type="text/css" rel="stylesheet" href="http://roy.red/theme/stylesheet/glslEditor.css">
+    <script type="application/javascript" src="http://roy.red/theme/script/glslEditor.js"></script>
   <script type="text/javascript" src="https://rawgit.com/patriciogonzalezvivo/glslCanvas/master/build/GlslCanvas.min.js"></script>
 
+    <link href="http://roy.red/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Roy.red Atom">
 
 
 
@@ -25,11 +26,11 @@
 <meta property="og:title" content="Drawing fractal Droste images"/>
 <meta property="og:description" content="When I was researching Droste images for a previous post, I occasionally came across strange versions which depicted multiple spirals, rather than the customary single spiral, like this one by David Pearson. This led me down a rabbit hole to understand what is actually going on in these images, and to see what I could make with the effect."/>
 <meta property="og:locale" content="en_US"/>
-<meta property="og:url" content="./fractal-droste-images-.html"/>
+<meta property="og:url" content="http://roy.red/fractal-droste-images-.html"/>
 <meta property="og:type" content="article"/>
 <meta property="article:published_time" content="2016-05-17 21:31:41-07:00"/>
 <meta property="article:modified_time" content=""/>
-<meta property="article:author" content="./author/roy-wiggins.html">
+<meta property="article:author" content="http://roy.red/author/roy-wiggins.html">
 <meta property="article:section" content="glsl"/>
 <meta property="article:tag" content="droste"/>
 <meta property="og:image" content="">
@@ -38,14 +39,14 @@
 <body>
   <aside>
     <div>
-      <a href=".">
-        <img src="./theme/img/profile.png" alt="Roy's Blog" title="Roy's Blog">
+      <a href="http://roy.red">
+        <img src="http://roy.red/theme/img/profile.png" alt="Roy's Blog" title="Roy's Blog">
       </a>
-      <h1><a href=".">Roy's Blog</a></h1>
+      <h1><a href="http://roy.red">Roy's Blog</a></h1>
       <p></p>
       <nav>
         <ul class="list">
-          <li><a href="./pages/resume-.html#resume">Resume</a></li>
+          <li><a href="http://roy.red/pages/resume-.html#resume">Resume</a></li>
           <li><a href="https://twitter.com/RoyWiggins" target="_blank">@RoyWiggins</a></li>
         </ul>
       </nav>
@@ -59,10 +60,10 @@
 <article>
   <header>
     <h1 id="fractal-droste-images">Drawing fractal Droste images</h1>
-    <p>Posted on Tue 17 May 2016 in <a href="./category/glsl.html">glsl</a></p>
+    <p>Posted on Tue 17 May 2016 in <a href="http://roy.red/category/glsl.html">glsl</a></p>
   </header>
   <div>
-    <p><a href="https://www.flickr.com/photos/fpsurgeon/2680685329/in/pool-escherdroste"><img style="float: right;" width="300" src="./images/2droste.jpg"/></a></p>
+    <p><a href="https://www.flickr.com/photos/fpsurgeon/2680685329/in/pool-escherdroste"><img style="float: right;" width="300" src="http://roy.red/images/2droste.jpg"/></a></p>
 <p>When I was researching Droste images for a <a href="/droste-.html">previous post</a>, I occasionally came across strange versions which depicted multiple spirals, rather than the customary single spiral, like this one by David Pearson. This led me down a rabbit hole to understand what is actually going on in these images, and to see what I could make with the effect. </p>
 <p>This is going to be a longer post, so feel free to scroll to the end to see the final fractal results. Spoiler alert: Mandelbrots.</p>
 <p>As with my previous posts, the embedded examples are all live shader code, and will automatically update as you edit them. They might not work correctly on all computers; your browser must support WebGL without too many bugs.</p>
@@ -106,7 +107,7 @@ vec3 color(vec2 z) {
 <div style='clear:right'></div>
 
 <p>On the sphere above, I've drawn a circle with radius <span class="math">\(0.5\)</span> to help orient us; it gets projected to the lower hemisphere. Wave your mouse cursor over the sphere to tip it up and down. The sphere is <a href="http://9bitscience.blogspot.com/2013/07/raymarching-distance-fields_14.html">raymarched</a> based on <a href="http://glslsandbox.com/e#29798.0">this code</a>.</p>
-<p>The next step is to note that a logarithmic spiral projected back onto the sphere is a <a href="https://en.wikipedia.org/wiki/Rhumb_line">loxodrome</a>, or rhumb line. This is caused by the logarithmic spiral being also "equiangular": at every point, if you draw a circle centered at the origin that goes through it, the tangent will always make the same angle with the circle. Under stereographic projection, that circle becomes a <a href="https://en.wikipedia.org/wiki/Latitude">parallel</a>. Luckily for us, it's easy to generate one: a circle transformed by the droste effect is a logarithmic spiral. Let's superimpose that on our domain coloring to see how it looks on the sphere. </p>
+<p>The next step is to note that a logarithmic spiral projected back onto the sphere is a <a href="https://www.jasondavies.com/maps/loxodrome/">loxodrome</a>, or rhumb line. This is caused by the logarithmic spiral being also "equiangular": at every point, if you draw a circle centered at the origin that goes through it, the tangent will always make the same angle with the circle. Under stereographic projection, that circle becomes a <a href="https://en.wikipedia.org/wiki/Latitude">parallel</a>. Luckily for us, it's easy to generate one: a circle transformed by the droste effect is a logarithmic spiral. Let's superimpose that on our domain coloring to see how it looks on the sphere. </p>
 <div class="codeAndCanvas" data="vec3 domain(vec2 z){
     // r1=0.7, r2=1.4:
     z = droste_(z,0.7,1.4);
@@ -306,7 +307,7 @@ vec3 color(vec2 z) {
   </div>
   <div class="tag-cloud">
     <p>
-      <a href="./tag/droste.html">droste</a>
+      <a href="http://roy.red/tag/droste.html">droste</a>
     </p>
   </div>
 </article>
@@ -331,13 +332,13 @@ vec3 color(vec2 z) {
   "author": {
     "@type": "Person",
     "name": "Roy Wiggins",
-    "url": "./author/roy-wiggins.html"
+    "url": "http://roy.red/author/roy-wiggins.html"
   },
   "image": "{{ SITEURL }}/{{ THEME_STATIC_DIR }}/img/profile.png",
-  "url": "./fractal-droste-images-.html",
+  "url": "http://roy.red/fractal-droste-images-.html",
   "description": "When I was researching Droste images for a previous post, I occasionally came across strange versions which depicted multiple spirals, rather than the customary single spiral, like this one by David Pearson. This led me down a rabbit hole to understand what is actually going on in these images, and to see what I could make with the effect."
 }
 </script>  
-  <script type="application/javascript" src="./theme/script/main.js"></script>
+  <script type="application/javascript" src="http://roy.red/theme/script/main.js"></script>
 </body>
 </html>

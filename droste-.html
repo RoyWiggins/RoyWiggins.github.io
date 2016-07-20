@@ -3,14 +3,15 @@
 <head>
   <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic' rel='stylesheet' type='text/css'>
 
-    <link rel="stylesheet" type="text/css" href="./theme/stylesheet/style.min.css">
-    <link rel="stylesheet" type="text/css" href="./theme/stylesheet/extra.css">
-  <link rel="stylesheet" type="text/css" href="./theme/stylesheet/pygments.min.css">
-  <link rel="stylesheet" type="text/css" href="./theme/stylesheet/font-awesome.min.css">
-    <link type="text/css" rel="stylesheet" href="./theme/stylesheet/glslEditor.css">
-    <script type="application/javascript" src="./theme/script/glslEditor.js"></script>
+    <link rel="stylesheet" type="text/css" href="http://roy.red/theme/stylesheet/style.min.css">
+    <link rel="stylesheet" type="text/css" href="http://roy.red/theme/stylesheet/extra.css">
+  <link rel="stylesheet" type="text/css" href="http://roy.red/theme/stylesheet/pygments.min.css">
+  <link rel="stylesheet" type="text/css" href="http://roy.red/theme/stylesheet/font-awesome.min.css">
+    <link type="text/css" rel="stylesheet" href="http://roy.red/theme/stylesheet/glslEditor.css">
+    <script type="application/javascript" src="http://roy.red/theme/script/glslEditor.js"></script>
   <script type="text/javascript" src="https://rawgit.com/patriciogonzalezvivo/glslCanvas/master/build/GlslCanvas.min.js"></script>
 
+    <link href="http://roy.red/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Roy.red Atom">
 
 
 
@@ -25,11 +26,11 @@
 <meta property="og:title" content="Implementing the Droste effect in WebGL"/>
 <meta property="og:description" content="The Droste effect is a name given to pictures that contain themselves, like an infinite series of nesting dolls. The conventional Droste effect is interesting, but it was taken to new heights by M.C. Escher's "Print Gallery." I wanted to understand how Escher's Print Gallery effect actually worked, and implement it myself."/>
 <meta property="og:locale" content="en_US"/>
-<meta property="og:url" content="./droste-.html"/>
+<meta property="og:url" content="http://roy.red/droste-.html"/>
 <meta property="og:type" content="article"/>
 <meta property="article:published_time" content="2016-04-25 22:33:23-07:00"/>
 <meta property="article:modified_time" content=""/>
-<meta property="article:author" content="./author/roy-wiggins.html">
+<meta property="article:author" content="http://roy.red/author/roy-wiggins.html">
 <meta property="article:section" content="glsl"/>
 <meta property="og:image" content="./images/droste-rect-thumb.jpg">
   <title>Roy.red &ndash; Implementing the Droste effect in WebGL</title>
@@ -37,14 +38,14 @@
 <body>
   <aside>
     <div>
-      <a href=".">
-        <img src="./theme/img/profile.png" alt="Roy's Blog" title="Roy's Blog">
+      <a href="http://roy.red">
+        <img src="http://roy.red/theme/img/profile.png" alt="Roy's Blog" title="Roy's Blog">
       </a>
-      <h1><a href=".">Roy's Blog</a></h1>
+      <h1><a href="http://roy.red">Roy's Blog</a></h1>
       <p></p>
       <nav>
         <ul class="list">
-          <li><a href="./pages/resume-.html#resume">Resume</a></li>
+          <li><a href="http://roy.red/pages/resume-.html#resume">Resume</a></li>
           <li><a href="https://twitter.com/RoyWiggins" target="_blank">@RoyWiggins</a></li>
         </ul>
       </nav>
@@ -58,17 +59,17 @@
 <article>
   <header>
     <h1 id="droste">Implementing the Droste effect in WebGL</h1>
-    <p>Posted on Mon 25 April 2016 in <a href="./category/glsl.html">glsl</a></p>
+    <p>Posted on Mon 25 April 2016 in <a href="http://roy.red/category/glsl.html">glsl</a></p>
   </header>
   <div>
     <noscript><h3>Hi! It looks like you've turned off Javascript. I'm sorry to say that WebGL and math rendering require Javascript, so this post will appear broken with Javascript turned off.</h2></noscript>
 
-<p><a href="./images/Droste.jpg"><img style="float: right;" width="200" src="./images/Droste.jpg"></a></p>
+<p><a href="http://roy.red/images/Droste.jpg"><img style="float: right;" width="200" src="http://roy.red/images/Droste.jpg"></a></p>
 <p>In this post, I'm going to explore how to implement the so-called "<a href="https://en.wikipedia.org/wiki/Droste_effect">Droste effect</a>." The Droste effect is a name given to pictures that contain themselves, like an infinite series of nesting dolls. The conventional Droste effect is interesting, but it was taken to new heights by M.C. Escher's "Print Gallery." </p>
-<p><a href="http://escherdroste.math.leidenuniv.nl/images/scan450.jpg"><img style="float: left; margin-right:1em; margin-bottom:0.5em" src="./images/print-gallery.jpg"></a></p>
+<p><a href="http://escherdroste.math.leidenuniv.nl/images/scan450.jpg"><img style="float: left; margin-right:1em; margin-bottom:0.5em" src="http://roy.red/images/print-gallery.jpg"></a></p>
 <p>The Print Gallery has the peculiar quality that if you follow the gaze of the person in the lower right corner, into the picture he is looking at, and around the image clockwise you find that you have come back to where you started: looking at a figure, looking at a picture. In some sense, this is a "Droste" picture: the print gallery contains a picture of the city that the print gallery is located in, except "zooming in" is replaced by walking around the origin. </p>
 <p><a href="http://escherdroste.math.leidenuniv.nl/">Mathematicians and artists in the Netherlands</a> managed to reverse-engineer the picture, and determined a transformation that can take an ordinary Droste image to a <a href="https://www.flickr.com/search/?text=droste%20effect">twisted, Escher-like image</a>. They published an <a href="http://www.ams.org/notices/200304/fea-escher.pdf">article</a> explaining how it works, but on first and second reading I will admit I could make neither head nor tails of it. If it makes more sense to you, the rest of this post is going to be mostly superfluous! If you want to play with an existing implementation, check out <a href="http://www.photospiralysis.com/">Photospiralysis</a>, which works in the browser.</p>
-<p><a href="./images/droste-rect.jpg"><img style="float: right;" width="200" src="./images/droste-rect-thumb.jpg"></a></p>
+<p><a href="http://roy.red/images/droste-rect.jpg"><img style="float: right;" width="200" src="http://roy.red/images/droste-rect-thumb.jpg"></a></p>
 <p>I wanted to understand how Escher's Print Gallery effect actually worked, and implement it myself. Luckily, the incomparable Jos Leys has written a pretty straightforward <a href="http://www.josleys.com/article_show.php?id=82">explanation</a>, with pictures &amp; equations. Most of the following is going to be lifted directly from his article, except we're going to implement it as we read along. I recommend you read his article first, or at least give it a skim.</p>
 <p>The implementation will be as a GLSL fragment shader (aka pixel shader). These are fast, and if you stick to GLSL2.0, it will work happily in the browser and many other places. If you've never touched fragment shaders, it would help to at least glance over <a href="http://patriciogonzalezvivo.com/2015/thebookofshaders/">The Book of Shaders</a> first. I am borrowing the author's code framework for displaying live examples.</p>
 <p>Jos Leys explains how the transformation goes forward from a square picture to a Droste picture. To work as a fragment shader, we're going to <strong>invert the transformation</strong>. For each point in the Droste picture, we work out which point on the original picture maps to it, and color our pixel accordingly. Working in this mode gives a feel of "warping space" rather than warping the image directly. </p>
@@ -302,13 +303,13 @@ vec3 color(vec2 z){
   "author": {
     "@type": "Person",
     "name": "Roy Wiggins",
-    "url": "./author/roy-wiggins.html"
+    "url": "http://roy.red/author/roy-wiggins.html"
   },
   "image": "./images/droste-rect-thumb.jpg",
-  "url": "./droste-.html",
+  "url": "http://roy.red/droste-.html",
   "description": "The Droste effect is a name given to pictures that contain themselves, like an infinite series of nesting dolls. The conventional Droste effect is interesting, but it was taken to new heights by M.C. Escher's "Print Gallery." I wanted to understand how Escher's Print Gallery effect actually worked, and implement it myself."
 }
 </script>  
-  <script type="application/javascript" src="./theme/script/main.js"></script>
+  <script type="application/javascript" src="http://roy.red/theme/script/main.js"></script>
 </body>
 </html>

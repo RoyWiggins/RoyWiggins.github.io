@@ -1,2 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Roy.red</title><link href="http://roy.red/" rel="alternate"></link><link href="http://roy.red/feeds/misc.atom.xml" rel="self"></link><id>http://roy.red/</id><updated>2016-04-02T18:40:03-07:00</updated><entry><title>Hello world</title><link href="http://roy.red/hello-world-.html" rel="alternate"></link><updated>2016-04-02T18:40:03-07:00</updated><author><name>Roy Wiggins</name></author><id>tag:roy.red,2016-04-02:hello-world-.html</id><summary type="html">&lt;p&gt;Hello world.&lt;/p&gt;</summary></entry></feed>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Roy.red</title><link href="http://roy.red/" rel="alternate"></link><link href="http://roy.red/feeds/misc.atom.xml" rel="self"></link><id>http://roy.red/</id><updated>2016-05-04T21:04:56-07:00</updated><entry><title>Fun with interference patterns</title><link href="http://roy.red/interference-.html" rel="alternate"></link><updated>2016-05-04T21:04:56-07:00</updated><author><name>Roy Wiggins</name></author><id>tag:roy.red,2016-05-04:interference-.html</id><summary type="html">&lt;p&gt;Ordinary trigonometric functions can produce really interesting, structured patterns if you use sufficiently large numbers. There's nothing fancy happening here, but at different scales and with different constants, the result can change quite drastically. Try zooming in (&lt;code&gt;z = z * 0.01&lt;/code&gt; for instance) and you'll see that it's just bands of white and black. It's only when you zoom out that creeping bands moving in crazy directions appear.&lt;/p&gt;
+&lt;div class="codeAndCanvas" data="vec3 color(vec2 z) {
+    z = z * 1.;
+    float r=length(z);
+    return vec3(sin(cos(r)*r*(u_time+1000.)*10.0));
+}"&gt;&lt;/div&gt;
+
+&lt;p&gt;I'm fairly sure this is a straightforward consequence of interference. The square grid of pixels is sampling the underlying equation at regular intervals. The result is a kind of &lt;a href="https://en.wikipedia.org/wiki/Moir%C3%A9_pattern"&gt;moiré pattern&lt;/a&gt;. For photography and graphics applications aliasing is Bad News, but you can harness it to produce interesting patterns. &lt;/p&gt;
+&lt;div style='clear:right'&gt;&lt;/div&gt;
+
+&lt;p&gt;Anyway, math aside, you can pretty much just start messing with constants and mushing trigonometric functions together here and see what happens. It inherits some of the rotational symmetry of the underlying pattern, so we end up with something that isn't completely mush. Plugging the time variable into a periodic function like &lt;code&gt;sin&lt;/code&gt; lets us quite easily find interesting loops, ripe for the giffing. &lt;/p&gt;
+&lt;div class="codeAndCanvas" data="vec3 color(vec2 pt) {
+    pt = pt * 1.6;
+    float r = length(pt);
+    float stime = 4.*sin(u_time * 2. * PI)+100.;
+    return vec3(r+cos(cos(r*r*100.)*stime));
+}"&gt;&lt;/div&gt;
+
+&lt;div style='clear:right'&gt;&lt;/div&gt;
+
+&lt;p&gt;My current "fancy" way to gif something is to render it in &lt;a href="https://syntopia.github.io/Fragmentarium/index.html"&gt;Fragmentarium&lt;/a&gt; and take the resulting pngs and run them through &lt;a href="https://www.imagemagick.org/script/index.php"&gt;ImageMagick&lt;/a&gt;'s &lt;code&gt;convert&lt;/code&gt; utility. This is a bit fiddly, so often I just use my favorite program: &lt;a href="http://blog.bahraniapps.com/gifcam/"&gt;GifCam&lt;/a&gt;! It's a tiny utility that records gifs directly off your screen. It certainly won't produce the best, smallest, lowest-artifact gif, but it's easy to use and the results aren't half bad!&lt;/p&gt;
+&lt;p&gt;&lt;img width="250" src="/images/interference-1.gif"/&gt;
+&lt;img width="250" src="/images/circles_m.gif"/&gt;
+&lt;img width="250" src="/images/mandala2.gif"/&gt;&lt;/p&gt;</summary></entry></feed>

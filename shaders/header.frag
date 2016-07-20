@@ -5,6 +5,12 @@ precision mediump float;
 uniform vec2 u_resolution;
 uniform vec2 u_mouse;
 uniform float u_time;
+
+uniform sampler2D u_tex0;
+uniform sampler2D u_tex1;
+uniform sampler2D u_tex2;
+uniform sampler2D u_tex3;
+
 float zoom = 0.5;
 vec2 offset = vec2(0.5);
 
