@@ -319,3 +319,6 @@ vec2 mouse_uv(){
 vec3 phase_portrait(vec2 z){
     return vec3(hsv2rgb(vec3(atan(z.y,z.x)/PI2,1.,1.)));
 }
+mat2 rot_mat2(float a){
+    return mat2(cos(a),-sin(a),sin(a),cos(a));
+}
