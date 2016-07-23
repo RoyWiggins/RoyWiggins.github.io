@@ -125,6 +125,11 @@ vec3 color(vec2 z) {
 }"&gt;&lt;/div&gt;
 
 &lt;p&gt;That's all for now! If you want to have some more fun with Droste images, check out my previous post on &lt;a href="/fractal-droste-images-.html"&gt;fractally-distorted drostes&lt;/a&gt;. Or perhaps take a leap into the &lt;a href="/slitscan-.html"&gt;Time Tunnel&lt;/a&gt;!&lt;/p&gt;
+&lt;p&gt;See also:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;David Bailey's &lt;a href="http://www.tess-elation.co.uk/self-similar-tessellations"&gt;World of Tessellations&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://shashi.github.io/ijulia-notebooks/funcgeo/"&gt;Functional Geometry in Julia&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
 &lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "center",
         indent = "0em",
