@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom"><title>Roy.red</title><link href="http://roy.red/" rel="alternate"></link><link href="http://roy.red/feeds/all.atom.xml" rel="self"></link><id>http://roy.red/</id><updated>2016-07-20T20:15:16-07:00</updated><entry><title>Infinite Regression: Many Pictures From One Function</title><link href="http://roy.red/infinite-regression-.html" rel="alternate"></link><updated>2016-07-20T20:15:16-07:00</updated><author><name>Roy Wiggins</name></author><id>tag:roy.red,2016-07-20:infinite-regression-.html</id><summary type="html">&lt;p&gt;&lt;a href="http://roy.red/images/regular-division-of-the-plane-vi.jpg"&gt;&lt;img style="float: right;" width="200" src="http://roy.red/images/regular-division-of-the-plane-vi.jpg"&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;I was interested in trying to imitate Escher's image, "Regular Division of the Plane IV", which depicts an infinite regression of tiles towards the edge. In doing so, I realized I'd re-written a function I'd seen elsewhere- in &lt;a href="http://www.gamedev.net/topic/590070-glsl-droste"&gt;generating Droste images&lt;/a&gt;- but hadn't looked at closely to understand what it could be used for. It's actually quite powerful and can be used to explore several of Escher's prints! So in this post I am going to play with this function and show how you can manipulate it to generate interesting scaling tilings, as well as a square Droste image (&lt;a href="/droste-.html"&gt;see previous&lt;/a&gt;). As usual there's an (over?)abundance of live code you can fiddle with.&lt;/p&gt;
+&lt;p&gt;I was interested in trying to imitate Escher's image, "Regular Division of the Plane IV", which depicts an infinite regression of tiles towards the edge. In doing so, I realized I'd re-written a function I'd seen elsewhere- in &lt;a href="http://www.gamedev.net/topic/590070-glsl-droste"&gt;generating Droste images&lt;/a&gt;- but hadn't looked at closely to understand what it could be used for. It's actually quite powerful and can be used to explore several of Escher's prints! So in this post I am going to play with this function and show how you can manipulate it to generate interesting scaling tilings, as well as a square Droste image (&lt;a href="/droste-.html"&gt;see previous&lt;/a&gt;). As usual there's an (over?)abundance of live code you can fiddle with. The code is GLSL. If GLSL is new to you, take a peek at the &lt;a href="https://thebookofshaders.com/"&gt;Book of Shaders&lt;/a&gt;; the editor will look familiar because I've borrowed it. &lt;/p&gt;
 &lt;p&gt;The equation is extremely simple:&lt;/p&gt;
 &lt;div class="math"&gt;$$f(x) = 2^{\lfloor \log_2{x}\rfloor}$$&lt;/div&gt;
 &lt;p&gt;It turns out it has the exact property we need to draw this sort of image. It's plotted below; &lt;a href="https://www.desmos.com/calculator/4umgsbyrnk"&gt;see also in Desmos&lt;/a&gt;. It builds a staircase that grows a lot like &lt;span class="math"&gt;\(y = x\)&lt;/span&gt;, except that it has discrete jumps at every integer power of two. It also preserves some of the &lt;em&gt;dilational symmetry&lt;/em&gt; of &lt;span class="math"&gt;\(y=x\)&lt;/span&gt;: you can scale the whole thing by a power of two and you get the same plot. Ignoring the coloring, an extension of Escher's print across the whole half-plane would have the same exact symmetry.&lt;/p&gt;
@@ -61,33 +61,25 @@ vec3 color(vec2 z) {
 
 &lt;p&gt;Looking at this, I saw the obvious similarity to Droste images; it is a Droste image, except that we've got extra copies of the original. "Extra copies" is a good problem to have, because we're just a constant or two away from a classic square Droste picture. &lt;/p&gt;
 &lt;div style='clear:right' class="codeAndCanvas" data-textures="/images/labyrinth.jpg" data="float f(float x){
-    return exp2(-floor(log2(x))-1.); // here's the change
+    return exp2(-floor(log2(x))-2.); // here's the change
 }
-vec3 texture(vec2 z){
-    return texture2D(u_tex0,z*0.5+0.5).xyz;
-}
+
 vec3 color(vec2 z) { 
     vec2 a_z = abs(z);
     float scale = f(max(a_z.x,a_z.y));
-    return texture(z*scale);
+    return texture2D(u_tex0,z*scale+0.5).xyz;
 }"&gt;&lt;/div&gt;
 
 &lt;p&gt;And now we can apply Escher's twist that &lt;a href="/droste-.html"&gt;I implemented previously&lt;/a&gt;. This time though, we don't need to use any modulo function, since we already have our infinitely nesting copies. This makes the transformation nearly a one-liner.&lt;/p&gt;
 &lt;div style='clear:right' class="codeAndCanvas" data-textures="/images/labyrinth.jpg" data="float f(float x){
     return exp2(-floor(log2(x)));
 }
-mat2 rotate(float a){
-    return mat2(cos(a),-sin(a),sin(a),cos(a));
-}
-vec3 texture(vec2 z){
-    return texture2D(u_tex0,z*.5+0.5).xyz;
-}
 vec3 color(vec2 z) { 
     float angle = atan(log(2.)/(2.0*PI));
     z = cExp(cDiv(cLog(z), cExp(vec2(0,angle))*cos(angle))); 
     vec2 a_z = abs(z);
     z *= f(max(a_z.x,a_z.y)*2.);
-    return texture(z);
+    return texture2D(u_tex0,z*.5+0.5).xyz;
 }"&gt;&lt;/div&gt;
 
 &lt;p&gt;The obvious generalization to &lt;span class="math"&gt;\(f\)&lt;/span&gt; is to allow an arbitrary exponent, and it turns out it also generalizes our Droste too, adjusting how deep each copy is created. &lt;/p&gt;
@@ -95,22 +87,16 @@ vec3 color(vec2 z) {
 &lt;div style='clear:right' class="codeAndCanvas" data-textures="/images/labyrinth.jpg" data="float f(float x,float n){
     return pow(n,-floor(log(x)/log(n)));
 }
-mat2 rotate(float a){
-    return mat2(cos(a),-sin(a),sin(a),cos(a));
-}
-vec3 texture(vec2 z){
-    return texture2D(u_tex0,z+0.5).xyz;
-}
 vec3 color(vec2 z) {
     float ratio = 5.264;
     float angle = atan(log(ratio)/(2.0*PI));
     z = cExp(cDiv(cLog(z), cExp(vec2(0,angle))*cos(angle)));
     vec2 a_z = abs(z);
     z *= f(max(a_z.x,a_z.y)*2.,ratio);
-    return texture(z/ratio);
+    return texture2D(u_tex0,z/ratio+.5).xyz;
 }"&gt;&lt;/div&gt;
 
-&lt;p&gt;And with some more constants and an adjustment, there's a version of Escher's &lt;a href="http://www.wikiart.org/en/m-c-escher/square-limit?utm_source=returned"&gt;Square Limit&lt;/a&gt; hidden inside here as well!&lt;/p&gt;
+&lt;p&gt;And with some more constants and an adjustment, there's a simple version of Escher's &lt;a href="http://www.wikiart.org/en/m-c-escher/square-limit?utm_source=returned"&gt;Square Limit&lt;/a&gt; hidden inside here as well!&lt;/p&gt;
 &lt;div style='clear:right' class="codeAndCanvas" data="float f(float x){
     return exp2(-floor(log2(x)));
 }
