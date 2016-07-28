@@ -647,7 +647,7 @@ vec3 color(vec2 z){
 }
 "&gt;&lt;/div&gt;
 
-&lt;p&gt;In the next post(s), I'll explore how to handle Drostifying a square. I'll also show how to generalize the effect by adjusting how much it twists, how many arms the spiral has, and more.&lt;/p&gt;
+&lt;p&gt;In the next post(s), I'll explore how to handle (Drostifying a square)[http://roy.red/infinite-regression-.html#infinite-regression]. I'll also show how to generalize the effect by adjusting how much it twists, how many arms the spiral has, and more.&lt;/p&gt;
 &lt;p&gt;As a reward for making it all the way to the end, here's an example of what you can do with the Droste effect! On the left is the original animation, and on the right the Droste transformation has been applied.&lt;/p&gt;
 &lt;p&gt;&lt;center&gt;
 &lt;canvas class="glslCanvas" style:"margin: auto;" data-fragment-url="../shaders/gears.frag" width="500" height="250"&gt;&lt;/canvas&gt;
