@@ -23,7 +23,7 @@
 <meta name="description" content="The slit-scan effect is a classic analog special effect used in the "Stargate" sequence in 2001: A Space Odyssey, and the title sequence for the Fourth Doctor. It turns out this effect is absolutely begging to be implemented as a WebGL fragment shader, and the transformation can be done in only a few lines of code!" />
 <meta name="keywords" content="drwho, glsl">
 <meta property="og:site_name" content="Roy.red"/>
-<meta property="og:title" content="Implementing the Doctor Who Time Tunnel"/>
+<meta property="og:title" content="Recreating the Doctor Who Time Tunnel in GLSL"/>
 <meta property="og:description" content="The slit-scan effect is a classic analog special effect used in the "Stargate" sequence in 2001: A Space Odyssey, and the title sequence for the Fourth Doctor. It turns out this effect is absolutely begging to be implemented as a WebGL fragment shader, and the transformation can be done in only a few lines of code!"/>
 <meta property="og:locale" content="en_US"/>
 <meta property="og:url" content="http://roy.red/slitscan-.html"/>
@@ -35,7 +35,7 @@
 <meta property="article:tag" content="drwho"/>
 <meta property="article:tag" content="glsl"/>
 <meta property="og:image" content="">
-  <title>Roy.red &ndash; Implementing the Doctor Who Time Tunnel</title>
+  <title>Roy.red &ndash; Recreating the Doctor Who Time Tunnel in GLSL</title>
 </head>
 <body>
   <aside>
@@ -61,7 +61,7 @@
 
 <article>
   <header>
-    <h1 id="slitscan">Implementing the Doctor Who Time Tunnel</h1>
+    <h1 id="slitscan">Recreating the Doctor Who Time Tunnel in GLSL</h1>
     <p>Posted on Wed 27 April 2016 in <a href="http://roy.red/category/glsl.html">glsl</a></p>
   </header>
   <div>
@@ -73,7 +73,7 @@
 <p>The real trick is that you move the transparency horizontally (behind the slit) as the camera is moved backward. Successive slices of the texture on the transparency will get mapped to successively "further away" slices on the foreshortened rectangle. After you expose one frame, you reset the setup except you advance the start position of the transparency slightly. Rinse repeat and suddenly you have an animated tunnel. </p>
 <p>It turns out you can perform the same thing with an arbitrarily-shaped "slit." Instead of a line, your slit can be an approximation of a square, a circle, or probably anything. The second-most famous use of the slit-scan showed multiple shapes off: for the Fourth Doctor's time-tunnel, there's even a TARDIS-shaped effect!</p>
 <p><center><iframe width="640" height="360" src="https://www.youtube.com/embed/1fnzcAFy8d8" frameborder="0" allowfullscreen></iframe></center></p>
-<p>That's enough intro; let's start implementing the sequence I found most intriguing: the circular tunnel. Don't forget that the examples here are all live: you can tweak them and the visuals will update themselves.</p>
+<p>That's enough intro; let's start implementing the sequence I found most intriguing: the circular tunnel. Don't forget that the examples here are all live: you can tweak them and the visuals will update themselves thanks to code borrowed from the <a href="http://patriciogonzalezvivo.com/2015/thebookofshaders/">Book of Shaders</a>.</p>
 <p>To start with, we need a texture. Different textures produce widely varying results, but here's one good one using iq's <a href="https://www.shadertoy.com/view/Xd23Dh">voronoise</a>. </p>
 <div class="codeAndCanvas" data="vec3 color(vec2 pt) {
     return vec3(iqnoise(5.*pt,1.,1.));
@@ -109,7 +109,7 @@
 <p>What's really fun is that we really are mimicking the original analog transformation, all without drawing a single polygon. I misspent a few hours hand-painting a texture, and managed to render a tunnel whose outlines match the original more or less exactly, so I am confident that this transformation (ignoring constants) really is equivalent to a slit-scan.</p>
 <div style='position:relative;padding-bottom:calc(50% / 2.00);clear:right;'><iframe src='https://gfycat.com/ifr/IdealFamiliarCusimanse' frameborder='0' scrolling='no' width='100%' height='100%' style='position:absolute;top:0;left:0;' allowfullscreen></iframe></div>
 
-<p>Perhaps you want a different shaped tunnel. It's quite easy to induce different shapes simply by altering the distance function. Instead of taking <code>length(pt)</code>, we will use our own function. By and large, a graph of the <a href="https://en.wikipedia.org/wiki/Contour_line">contour lines</a> of this function will reflect the apparent shape of the tunnel. Comment out the marked lines here to experiment with different distance functions.</p>
+<p>Perhaps you want a different shaped tunnel. It's quite easy to induce different shapes simply by altering the distance function. Instead of taking <code>length(pt)</code>, we will use our own function. By and large, a graph of the <a href="https://en.wikipedia.org/wiki/Contour_line">contour lines</a> of this function will reflect the apparent shape of the tunnel. Comment out the marked lines here to experiment with different distance functions. </p>
 <div class="codeAndCanvas" data="float dist(vec2 pt) {
     //return min(abs(pt.x+pt.y),abs(pt.x-pt.y))+0.001;
     //return abs(pt.x+pt.y);
@@ -125,7 +125,7 @@ vec3 color(vec2 pt) {
     return vec3(iqnoise(5.*pt,1.,1.)+0.09*rInv);
 }"></div>
 
-<p>That's all for now. There is surely more to explore here- for instance, I haven't found any obvious distance functions that approximate a TARDIS outline, or Tom Baker's head...</p>
+<p>I also have a version of this <a href="https://www.shadertoy.com/view/4dtSWS">published on Shadertoy</a> (warning: autoplay sound). That's all for now! There is surely more to explore here- for instance, I haven't found any obvious distance functions that approximate a TARDIS outline, or Tom Baker's head...</p>
   </div>
   <div class="tag-cloud">
     <p>
@@ -148,8 +148,8 @@ vec3 color(vec2 pt) {
 {
   "@context": "http://schema.org",
   "@type": "BlogPosting",
-  "name": "Implementing the Doctor Who Time Tunnel",
-  "headline": "Implementing the Doctor Who Time Tunnel",
+  "name": "Recreating the Doctor Who Time Tunnel in GLSL",
+  "headline": "Recreating the Doctor Who Time Tunnel in GLSL",
   "datePublished": "2016-04-27 21:34:06-07:00",
   "dateModified": "",
   "author": {
