@@ -3,15 +3,14 @@
 <head>
   <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic' rel='stylesheet' type='text/css'>
 
-    <link rel="stylesheet" type="text/css" href="http://roy.red/theme/stylesheet/style.min.css">
-    <link rel="stylesheet" type="text/css" href="http://roy.red/theme/stylesheet/extra.css">
-  <link rel="stylesheet" type="text/css" href="http://roy.red/theme/stylesheet/pygments.min.css">
-  <link rel="stylesheet" type="text/css" href="http://roy.red/theme/stylesheet/font-awesome.min.css">
-    <link type="text/css" rel="stylesheet" href="http://roy.red/theme/stylesheet/glslEditor.css">
-    <script type="application/javascript" src="http://roy.red/theme/script/glslEditor.js"></script>
-  <script type="text/javascript" src="http://roy.red/theme/script/GlslCanvas.js"></script>
+    <link rel="stylesheet" type="text/css" href="./theme/stylesheet/style.min.css">
+    <link rel="stylesheet" type="text/css" href="./theme/stylesheet/extra.css">
+  <link rel="stylesheet" type="text/css" href="./theme/stylesheet/pygments.min.css">
+  <link rel="stylesheet" type="text/css" href="./theme/stylesheet/font-awesome.min.css">
+    <link type="text/css" rel="stylesheet" href="./theme/stylesheet/glslEditor.css">
+    <script type="application/javascript" src="./theme/script/glslEditor.js"></script>
+  <script type="text/javascript" src="./theme/script/GlslCanvas.js"></script>
 
-    <link href="http://roy.red/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Roy.red Atom">
 
 
 
@@ -26,11 +25,11 @@
 <meta property="og:title" content="Recreating the Doctor Who Time Tunnel in GLSL"/>
 <meta property="og:description" content="The slit-scan effect is a classic analog special effect used in the "Stargate" sequence in 2001: A Space Odyssey, and a title sequence in Doctor Who. It turns out this effect is absolutely begging to be implemented as a WebGL fragment shader, and the transformation can be done in only a few lines of code!"/>
 <meta property="og:locale" content="en_US"/>
-<meta property="og:url" content="http://roy.red/slitscan-.html"/>
+<meta property="og:url" content="./slitscan-.html"/>
 <meta property="og:type" content="article"/>
 <meta property="article:published_time" content="2016-04-27 21:34:06-07:00"/>
 <meta property="article:modified_time" content=""/>
-<meta property="article:author" content="http://roy.red/author/roy-wiggins.html">
+<meta property="article:author" content="./author/roy-wiggins.html">
 <meta property="article:section" content="glsl"/>
 <meta property="article:tag" content="drwho"/>
 <meta property="article:tag" content="glsl"/>
@@ -40,16 +39,17 @@
 <body>
   <aside>
     <div>
-      <a href="http://roy.red">
-        <img src="http://roy.red/theme/img/profile.png" alt="Roy's Blog" title="Roy's Blog">
+      <a href=".">
+        <img src="./theme/img/profile.png" alt="Roy's Blog" title="Roy's Blog">
       </a>
-      <h1><a href="http://roy.red">Roy's Blog</a></h1>
+      <h1><a href=".">Roy's Blog</a></h1>
       <p></p>
       <nav>
         <ul class="list">
-          <li><a href="http://roy.red/pages/resources-.html#resources">Resources</a></li>
-          <li><a href="http://roy.red/pages/resume-.html#resume">Resume</a></li>
+          <li><a href="./pages/resources-.html#resources">Resources</a></li>
+          <li><a href="./pages/resume-.html#resume">Resume</a></li>
           <li><a href="https://twitter.com/RoyWiggins" target="_blank">@RoyWiggins</a></li>
+          <li><a href="./editor" target="_blank">Editor</a></li>
         </ul>
       </nav>
       <ul class="social">
@@ -62,10 +62,10 @@
 <article>
   <header>
     <h1 id="slitscan">Recreating the Doctor Who Time Tunnel in GLSL</h1>
-    <p>Posted on Wed 27 April 2016 in <a href="http://roy.red/category/glsl.html">glsl</a></p>
+    <p>Posted on Wed 27 April 2016 in <a href="./category/glsl.html">glsl</a></p>
   </header>
   <div>
-    <p><img style="float: right;" width="300" src="http://roy.red/images/stargate.gif"/></p>
+    <p><img style="float: right;" width="300" src="./images/stargate.gif"/></p>
 <p>The slit-scan effect is a classic analog special effect. It was most famously used during the "Stargate" sequence in 2001: A Space Odyssey, and a title sequence in Doctor Who. It was done "in camera"- no CGI here at all. It's simple enough that it turns out this effect is absolutely begging to be implemented as a WebGL <a href="http://patriciogonzalezvivo.com/2015/thebookofshaders/01/">fragment shader</a>, and the transformation can be done in only a few lines of code! </p>
 <p>FilmmakerIQ produced a great explanation on how the method works practically. It's not required watching, but it explains it visually and shows how it was done.</p>
 <p><center><iframe src="https://player.vimeo.com/video/71702374" width="640" height="360" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></center></p>
@@ -129,8 +129,8 @@ vec3 color(vec2 pt) {
   </div>
   <div class="tag-cloud">
     <p>
-      <a href="http://roy.red/tag/drwho.html">drwho</a>
-      <a href="http://roy.red/tag/glsl.html">glsl</a>
+      <a href="./tag/drwho.html">drwho</a>
+      <a href="./tag/glsl.html">glsl</a>
     </p>
   </div>
 </article>
@@ -155,13 +155,13 @@ vec3 color(vec2 pt) {
   "author": {
     "@type": "Person",
     "name": "Roy Wiggins",
-    "url": "http://roy.red/author/roy-wiggins.html"
+    "url": "./author/roy-wiggins.html"
   },
   "image": "{{ SITEURL }}/{{ THEME_STATIC_DIR }}/img/profile.png",
-  "url": "http://roy.red/slitscan-.html",
+  "url": "./slitscan-.html",
   "description": "The slit-scan effect is a classic analog special effect used in the "Stargate" sequence in 2001: A Space Odyssey, and a title sequence in Doctor Who. It turns out this effect is absolutely begging to be implemented as a WebGL fragment shader, and the transformation can be done in only a few lines of code!"
 }
 </script>  
-  <script type="application/javascript" src="http://roy.red/theme/script/main.js"></script>
+  <script type="application/javascript" src="./theme/script/main.js"></script>
 </body>
 </html>

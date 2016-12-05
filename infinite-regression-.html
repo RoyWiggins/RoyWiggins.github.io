@@ -3,15 +3,14 @@
 <head>
   <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic' rel='stylesheet' type='text/css'>
 
-    <link rel="stylesheet" type="text/css" href="http://roy.red/theme/stylesheet/style.min.css">
-    <link rel="stylesheet" type="text/css" href="http://roy.red/theme/stylesheet/extra.css">
-  <link rel="stylesheet" type="text/css" href="http://roy.red/theme/stylesheet/pygments.min.css">
-  <link rel="stylesheet" type="text/css" href="http://roy.red/theme/stylesheet/font-awesome.min.css">
-    <link type="text/css" rel="stylesheet" href="http://roy.red/theme/stylesheet/glslEditor.css">
-    <script type="application/javascript" src="http://roy.red/theme/script/glslEditor.js"></script>
-  <script type="text/javascript" src="http://roy.red/theme/script/GlslCanvas.js"></script>
+    <link rel="stylesheet" type="text/css" href="./theme/stylesheet/style.min.css">
+    <link rel="stylesheet" type="text/css" href="./theme/stylesheet/extra.css">
+  <link rel="stylesheet" type="text/css" href="./theme/stylesheet/pygments.min.css">
+  <link rel="stylesheet" type="text/css" href="./theme/stylesheet/font-awesome.min.css">
+    <link type="text/css" rel="stylesheet" href="./theme/stylesheet/glslEditor.css">
+    <script type="application/javascript" src="./theme/script/glslEditor.js"></script>
+  <script type="text/javascript" src="./theme/script/GlslCanvas.js"></script>
 
-    <link href="http://roy.red/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Roy.red Atom">
 
 
 
@@ -26,11 +25,11 @@
 <meta property="og:title" content="Infinite Regression: Many Pictures From One Function"/>
 <meta property="og:description" content="Imitating a variety of Escherian limit tilings, as well as a squared-up Droste, by manipulating a simple function."/>
 <meta property="og:locale" content="en_US"/>
-<meta property="og:url" content="http://roy.red/infinite-regression-.html"/>
+<meta property="og:url" content="./infinite-regression-.html"/>
 <meta property="og:type" content="article"/>
 <meta property="article:published_time" content="2016-07-20 20:15:16-07:00"/>
 <meta property="article:modified_time" content=""/>
-<meta property="article:author" content="http://roy.red/author/roy-wiggins.html">
+<meta property="article:author" content="./author/roy-wiggins.html">
 <meta property="article:section" content="misc"/>
 <meta property="og:image" content="">
   <title>Roy.red &ndash; Infinite Regression: Many Pictures From One Function</title>
@@ -38,16 +37,17 @@
 <body>
   <aside>
     <div>
-      <a href="http://roy.red">
-        <img src="http://roy.red/theme/img/profile.png" alt="Roy's Blog" title="Roy's Blog">
+      <a href=".">
+        <img src="./theme/img/profile.png" alt="Roy's Blog" title="Roy's Blog">
       </a>
-      <h1><a href="http://roy.red">Roy's Blog</a></h1>
+      <h1><a href=".">Roy's Blog</a></h1>
       <p></p>
       <nav>
         <ul class="list">
-          <li><a href="http://roy.red/pages/resources-.html#resources">Resources</a></li>
-          <li><a href="http://roy.red/pages/resume-.html#resume">Resume</a></li>
+          <li><a href="./pages/resources-.html#resources">Resources</a></li>
+          <li><a href="./pages/resume-.html#resume">Resume</a></li>
           <li><a href="https://twitter.com/RoyWiggins" target="_blank">@RoyWiggins</a></li>
+          <li><a href="./editor" target="_blank">Editor</a></li>
         </ul>
       </nav>
       <ul class="social">
@@ -60,10 +60,10 @@
 <article>
   <header>
     <h1 id="infinite-regression">Infinite Regression: Many Pictures From One Function</h1>
-    <p>Posted on Wed 20 July 2016 in <a href="http://roy.red/category/misc.html">misc</a></p>
+    <p>Posted on Wed 20 July 2016 in <a href="./category/misc.html">misc</a></p>
   </header>
   <div>
-    <p><a href="http://roy.red/images/regular-division-of-the-plane-vi.jpg"><img style="float: right;" width="200" src="http://roy.red/images/regular-division-of-the-plane-vi.jpg"></a></p>
+    <p><a href="./images/regular-division-of-the-plane-vi.jpg"><img style="float: right;" width="200" src="./images/regular-division-of-the-plane-vi.jpg"></a></p>
 <p>I was interested in trying to imitate Escher's image, "Regular Division of the Plane IV", which depicts an infinite regression of tiles towards the edge. In doing so, I realized I'd re-written a function I'd seen elsewhere- in <a href="http://www.gamedev.net/topic/590070-glsl-droste">generating Droste images</a>- but hadn't looked at closely to understand what it could be used for. It's actually quite powerful and can be used to explore several of Escher's prints! So in this post I am going to play with this function and show how you can manipulate it to generate interesting scaling tilings, as well as a square Droste image (<a href="/droste-.html">see previous</a>). As usual there's an (over?)abundance of live code you can fiddle with. The code is GLSL. If GLSL is new to you, take a peek at the <a href="https://thebookofshaders.com/">Book of Shaders</a>; the editor will look familiar because I've borrowed it. </p>
 <p>The equation is extremely simple:</p>
 <div class="math">$$f(x) = 2^{\lfloor \log_2{x}\rfloor}$$</div>
@@ -264,13 +264,13 @@ vec3 color(vec2 z) {
   "author": {
     "@type": "Person",
     "name": "Roy Wiggins",
-    "url": "http://roy.red/author/roy-wiggins.html"
+    "url": "./author/roy-wiggins.html"
   },
   "image": "{{ SITEURL }}/{{ THEME_STATIC_DIR }}/img/profile.png",
-  "url": "http://roy.red/infinite-regression-.html",
+  "url": "./infinite-regression-.html",
   "description": "Imitating a variety of Escherian limit tilings, as well as a squared-up Droste, by manipulating a simple function."
 }
 </script>  
-  <script type="application/javascript" src="http://roy.red/theme/script/main.js"></script>
+  <script type="application/javascript" src="./theme/script/main.js"></script>
 </body>
 </html>

@@ -47,4 +47,6 @@ void main(){\n\
         }
     }    
 }
-loadGlslElements();
+window.onload = function () {
+	loadGlslElements();
+}
