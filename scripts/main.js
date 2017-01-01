@@ -123,12 +123,11 @@ void main(){\n\
         var theme = "default"
         var preF = preFunction;
         var postF = postFunction;
-        if (ccList[i].hasAttribute("pre")){
-            preF += ccList[i].getAttribute("pre");
-        }
-
         if (ccList[i].hasAttribute("literate")){
             preF += "\n"+cumulativeCode;
+        }
+        if (ccList[i].hasAttribute("pre")){
+            preF += ccList[i].getAttribute("pre");
         }
 
         if (ccList[i].hasAttribute("data")){

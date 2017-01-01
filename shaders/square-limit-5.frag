@@ -23,7 +23,7 @@ float bird(vec2 z){
     z *= mat2(0.,1.,-1.,0.);
     z += 4.;
     color = min(color,-bird_shape(-z*.5));
-    return smoothstep(-0.001,.001,color);;
+    return smoothstep(-0.001,.001,color);
 }
 const vec3 light = vec3(0.995,0.964,0.573);
 const vec3 mid = vec3(0.995,0.663,0.261);
