@@ -23,7 +23,7 @@
 <meta name="description" content="How to fold space into a Koch snowflake." />
 <meta name="keywords" content="glsl">
 <meta property="og:site_name" content="Roy.red"/>
-<meta property="og:title" content="Folding the Koch Snowflake"/>
+<meta property="og:title" content="Kaleidoscopic Fractals: Folding the Koch Snowflake"/>
 <meta property="og:description" content="How to fold space into a Koch snowflake."/>
 <meta property="og:locale" content="en_US"/>
 <meta property="og:url" content="http://roy.red/folding-the-koch-snowflake-.html"/>
@@ -34,7 +34,7 @@
 <meta property="article:section" content="glsl"/>
 <meta property="article:tag" content="glsl"/>
 <meta property="og:image" content="">
-  <title>Roy.red &ndash; Folding the Koch Snowflake</title>
+  <title>Roy.red &ndash; Kaleidoscopic Fractals: Folding the Koch Snowflake</title>
 </head>
 <body>
   <aside>
@@ -61,11 +61,11 @@
 
 <article>
   <header>
-    <h1 id="folding-the-koch-snowflake">Folding the Koch Snowflake</h1>
+    <h1 id="folding-the-koch-snowflake">Kaleidoscopic Fractals: Folding the Koch Snowflake</h1>
     <p>Posted on Tue 03 January 2017 in <a href="http://roy.red/category/glsl.html">glsl</a></p>
   </header>
   <div>
-    <p>I came across a shader that generated a <a href="https://www.shadertoy.com/view/XdcGzH">very pretty version of the Koch curve</a>. I realized that after stepping through the code it was a good, simple example of generating fractals with folds. The code here is in the form of fragment shaders. For a shader primer, check out the <a href="http://thebookofshaders.com/">Book of Shaders</a>. The important thing is that to write a fragment shader, you build a function that takes a location (in our case, of a pixel) and returns a color. All the code here is "live", though changes you make in each box will not cascade down to the subsequent ones.</p>
+    <p>I came across a shader that generated a <a href="https://www.shadertoy.com/view/XdcGzH">very pretty version</a> of the Koch snowflake](https://en.wikipedia.org/wiki/Koch_snowflake). I realized that after stepping through the code that the Koch snowflake is a good, simple example of generating fractals with folds. The code here is in the form of fragment shaders. For a shader primer, check out the <a href="http://thebookofshaders.com/">Book of Shaders</a>. The important thing is that to write a fragment shader, you build a function that takes a location (in our case, of a pixel) and returns a color. All the code here is "live", though changes you make in each box will not cascade down to the subsequent ones.</p>
 <p><a href="http://acko.net/blog/how-to-fold-a-julia-fractal/"><img style="float: right;" width="300" src="http://roy.red/images/julia-iter.gif"/></a></p>
 <p>Generating the Koch curve this way is probably among the simplest examples of how fractals can be thought of as a repeated crumpling of space. The animation to the right is borrowed from <a href="http://acko.net/blog/how-to-fold-a-julia-fractal/">a presentation</a> by Steven Wittens that ably demonstrates this with a Julia fractal: squishing, translating and folding space progressively crumples up the boundary of the unit circle.</p>
 <p>For the Koch curve, we need a different sort of fold. It's easiest to understand the folding operation visually. I haven't taken the time to justify this formula, but it's just trigonometry. You can adjust the angle to see how it creates a kaleidoscopic effect, reflecting the plane across a line through the origin. </p>
@@ -316,8 +316,8 @@ vec3 color(vec2 pt) {
 {
   "@context": "http://schema.org",
   "@type": "BlogPosting",
-  "name": "Folding the Koch Snowflake",
-  "headline": "Folding the Koch Snowflake",
+  "name": "Kaleidoscopic Fractals: Folding the Koch Snowflake",
+  "headline": "Kaleidoscopic Fractals: Folding the Koch Snowflake",
   "datePublished": "2017-01-03 17:34:06-08:00",
   "dateModified": "",
   "author": {
