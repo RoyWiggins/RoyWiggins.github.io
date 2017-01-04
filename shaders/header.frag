@@ -225,14 +225,15 @@ float trace( vec3 origin, vec3 direction, out vec3 p )
  
     return totalDistanceTraveled;
 }
+
  
 // Standard Blinn lighting model.
-vec3 calculateLighting(vec3 pointOnSurface, vec3 surfaceNormal, vec3 lightPosition, vec3 cameraPosition,vec3 diff)
+vec3 calculateLighting(vec3 pointOnSurface, vec3 surfaceNormal, vec3 lightPosition, vec3 cameraPosition, vec3 color)
 {
     vec3 fromPointToLight = normalize(lightPosition - pointOnSurface);
     float diffuseStrength = clamp( dot( surfaceNormal, fromPointToLight ), 0.0, 1.0 );
     
-    vec3 diffuseColor = diffuseStrength * diff;
+    vec3 diffuseColor = diffuseStrength*color;
     vec3 reflectedLightVector = normalize( reflect( -fromPointToLight, surfaceNormal ) );
     
     vec3 fromPointToCamera = normalize( cameraPosition - pointOnSurface );
@@ -261,6 +262,7 @@ vec2 sphereViewer(vec2 uv, out float distanceToClosestPointInScene){
     vec2 projected = pointOnSurface.xy / (1.-pointOnSurface.z);
     return projected;
 }
+
 vec2 droste_(vec2 z,float r1, float r2) {
     z = cLog(z);
     float scale = log(r2/r1);
@@ -321,4 +323,76 @@ vec3 phase_portrait(vec2 z){
 }
 mat2 rot_mat2(float a){
     return mat2(cos(a),-sin(a),sin(a),cos(a));
+}
+
+float DE(vec3 p){
+	return 0.;
+}
+vec3 getDENormal( vec3 p )
+{
+    vec3 e = vec3( 0.001, 0.00, 0.00 );
+    
+    float deltaX = DE( p + e.xyy ) - DE( p - e.xyy );
+    float deltaY = DE( p + e.yxy ) - DE( p - e.yxy );
+    float deltaZ = DE( p + e.yyx ) - DE( p - e.yyx );
+    
+    return normalize( vec3( deltaX, deltaY, deltaZ ) );
+}
+
+float tracer( vec3 origin, vec3 direction, out vec3 p )
+{
+    float totalDistance = 0.0;
+
+    for( int i=0; i<35; ++i)
+    {
+        // Here we march along our ray and store the new point
+        // on the ray in the "p" variable.
+        p = origin + direction * totalDistance;
+        float dist = DE(p);
+        totalDistance += dist;
+        if( dist < 0.0001 ) break;
+        if( totalDistance > 100000.0 )
+        {
+            totalDistance = 0.;
+            break;
+        }
+    }
+ 
+    return totalDistance;
+}
+
+
+vec3 lighting2(vec3 pointOnSurface, vec3 surfaceNormal, vec3 lightPosition, vec3 cameraPosition)
+{
+    vec3 fromPointToLight = normalize(lightPosition - pointOnSurface);
+    float diffuseStrength = clamp( dot( surfaceNormal, fromPointToLight ), 0.0, 1.0 );
+    
+    vec3 diffuseColor = diffuseStrength * vec3( 1.0, 0.0, 0.0 );
+    vec3 reflectedLightVector = normalize( reflect( -fromPointToLight, surfaceNormal ) );
+    
+    vec3 fromPointToCamera = normalize( cameraPosition - pointOnSurface );
+    float specularStrength = pow( clamp( dot(reflectedLightVector, fromPointToCamera), 0.0, 1.0 ), 10.0 );
+ 
+    // Ensure that there is no specular lighting when there is no diffuse lighting.
+    specularStrength = min( diffuseStrength, specularStrength );
+    vec3 specularColor = specularStrength * vec3( 1.0 );
+    
+    vec3 finalColor = diffuseColor + specularColor; 
+ 
+    return finalColor;
+}
+
+vec3 simple_raymarch(vec2 uv){
+    vec3 cameraPosition = vec3( 0., 0.0, -2.0 );
+    vec3 cameraDirection = normalize( vec3( uv.x, uv.y, 1.0) );
+    vec3 pointOnSurface;
+    float distanceToClosestPointInScene = tracer( cameraPosition, cameraDirection, pointOnSurface );
+    vec3 finalColor = vec3(0.0);
+    if( distanceToClosestPointInScene > 0.0 )
+    {
+        vec3 lightPosition = vec3( 0.0, 0., -40.0 );
+        vec3 surfaceNormal = getDENormal( pointOnSurface );
+        finalColor = lighting2( pointOnSurface, surfaceNormal, lightPosition, cameraPosition);
+    }
+    return finalColor;
 }
