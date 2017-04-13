@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic' rel='stylesheet' type='text/css'>
+
+    <link rel="stylesheet" type="text/css" href="http://roy.red/theme/stylesheet/style.min.css">
+    <link rel="stylesheet" type="text/css" href="http://roy.red/theme/stylesheet/extra.css">
+  <link rel="stylesheet" type="text/css" href="http://roy.red/theme/stylesheet/pygments.min.css">
+  <link rel="stylesheet" type="text/css" href="http://roy.red/theme/stylesheet/font-awesome.min.css">
+    <link type="text/css" rel="stylesheet" href="http://roy.red/theme/stylesheet/glslEditor.css">
+    <script type="application/javascript" src="http://roy.red/theme/script/glslEditor.js"></script>
+  <script type="text/javascript" src="http://roy.red/theme/script/GlslCanvas.js"></script>
+
+    <link href="http://roy.red/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Roy.red Atom">
+
+
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="" />
+
+<meta name="author" content="Roy Wiggins" />
+<meta name="description" content="" />
+<meta name="keywords" content="">
+<meta property="og:site_name" content="Roy.red"/>
+<meta property="og:title" content="Folding Animated Hyperbolic & Spherical Tilings"/>
+<meta property="og:description" content=""/>
+<meta property="og:locale" content="en_US"/>
+<meta property="og:url" content="http://roy.red/folding-tilings-.html"/>
+<meta property="og:type" content="article"/>
+<meta property="article:published_time" content="2017-04-12 15:46:52-07:00"/>
+<meta property="article:modified_time" content=""/>
+<meta property="article:author" content="http://roy.red/author/roy-wiggins.html">
+<meta property="article:section" content="misc"/>
+<meta property="og:image" content="">
+  <title>Roy.red &ndash; Folding Animated Hyperbolic & Spherical Tilings</title>
+</head>
+<body>
+  <aside>
+    <div>
+      <a href="http://roy.red">
+        <img src="http://roy.red/theme/img/profile.png" alt="Roy's Blog" title="Roy's Blog">
+      </a>
+      <h1><a href="http://roy.red">Roy's Blog</a></h1>
+      <p></p>
+      <nav>
+        <ul class="list">
+          <li><a href="http://roy.red/pages/resources-.html#resources">Resources</a></li>
+          <li><a href="http://roy.red/pages/resume-.html#resume">Resume</a></li>
+          <li><a href="https://twitter.com/RoyWiggins" target="_blank">@RoyWiggins</a></li>
+          <li><a href="./editor" target="_blank">Editor</a></li>
+        </ul>
+      </nav>
+      <ul class="social">
+        <li><a class="sc-@RoyWiggins" href="https://twitter.com/RoyWiggins" target="_blank"><i class="fa fa-@RoyWiggins"></i></a></li>
+      </ul>
+    </div>
+  </aside>
+  <main>
+
+<article>
+  <header>
+    <h1 id="folding-tilings">Folding Animated Hyperbolic & Spherical Tilings</h1>
+    <p>Posted on Wed 12 April 2017 in <a href="http://roy.red/category/misc.html">misc</a></p>
+  </header>
+  <div>
+    <p>In a <a href="/folding-the-koch-snowflake-.html#folding-the-koch-snowflake">previous post</a>, I talked about generating interesting pictures by iterated folding operations. In this post I'm going to use another type of fold to draw both hyperbolic and spherical tilings. If you are already familiar with hyperbolic geometry and tilings, skip the next few paragraphs! There's code down at the bottom.</p>
+<p>In order to simplify what we're talking about, we can limit ourselves to tilings of right-angled triangles. In the Euclidean plane, there are two ways to tile the plane this way. One can be identified with a regular tiling of squares, and the other with a regular tiling of hexagons (or equilateral triangles). </p>
+<div style ="float:right; text-align: right; font-size: 0.8em; color:gray">
+<a href="https://en.wikipedia.org/wiki/Spherical_polyhedron#/media/File:Spherical_pentakis_dodecahedron.png"><img style="float:right;" width="200px" src="http://roy.red/images/spherical-dodecahedron.png"/></a><br/>A dodecahedral tiling</div>
+
+<p>There are no other ways to tile the plane like this. But instead of tiling the Euclidean plane, we can look toward other geometries. One you are probably familiar with is spherical geometry: instead of drawing lines on a flat plane, we draw arcs on a sphere. Inside the spherical geometry, portions of <a href="https://en.wikipedia.org/wiki/Great_circle">great circles</a> are actually straight lines. While things look a bit different, you can still build right triangles, and tile the sphere with them. On the sphere, there are few <a href="https://en.wikipedia.org/wiki/Spherical_polyhedron">more tilings</a>! </p>
+<p>In a sense, the spherical geometry is bending every straight line a bit towards every other straight line. If you extend a line segment, it will intersect every other line, "around the back" of the sphere. You can convince yourself of this with some patient time with a globe.</p>
+<hr style="clear:right;"/>
+
+<div style ="float:right; text-align: right; font-size: 0.8em; color:gray">
+<a href="https://upload.wikimedia.org/wikipedia/commons/f/f3/Hyperboloid-2s.svg"><img style="float:right;" src="http://roy.red/images/hyperboloid.svg" height="200px"/></a><br/>Two views of a hyperboloid</div>
+
+<p>There's another geometry that goes in the "other direction": it bends every straight line away from every other. This is the mysterious <a href="https://en.wikipedia.org/wiki/Hyperbolic_geometry">hyperbolic geometry</a>. It's called hyperbolic by analogy to the spherical geometry: you can draw lines as parts of hyperbolas, on one sheet of a hyperboloid.</p>
+<p>In this geometry, there are even more tilings (an infinite number, in fact). You can fit as many identical right triangles around a vertex as you like, and the resulting polygon can tile the plane. There is, in a sense, "more space" to move around in. If you draw two straight lines, they may intersect- but they might not intersect at all, no matter how far you extend them. There's 'more' space for the lines to go, and they tend to bend away from each other.</p>
+<p>While these geometries both "live" in three-dimensional objects (spheres and hyperboloids) they can be modeled in the plane. In the case of spherical geometry, you can simply <a href="https://en.wikipedia.org/wiki/Stereographic_projection">stereographically project</a> the sphere onto the plane. Straight lines (arcs) on the sphere become circles in the plane. Further away from the origin, objects look bigger (even if they're the same size on the sphere). </p>
+<div style ="float:right; text-align: right; font-size: 0.8em; color:gray"><a href="
+https://en.wikipedia.org/wiki/Poincar%C3%A9_disk_model#/media/File:HyperboloidProjection.png
+"><img src="http://roy.red/images/poincare-projection.png" height="200px"/></a><br/>Poincaré projection</div>
+
+<p>The model we are using of hyperbolic geometry is called the Poincaré Disk. It gathers the entirety of the hyperbolic space into a circle in the plane. It is formed similarly to the stereographic projection: it projects points on the hyperboloid down onto the plane by casting a ray from a point underneath.</p>
+<div style="clear:right;"/>
+<div style ="float:right; text-align: right; font-size: 0.8em; color:gray"><a href="https://en.wikipedia.org/wiki/Poincar%C3%A9_disk_model#/media/File:Droites_disquePoincaré.svg"><img src="http://roy.red/images/poincare.svg" height="200px"/></a><br/>Three hyperbolic lines</div>
+
+Straight lines (hyperbolas) in the hyperbolic geometry are drawn as circles in the plane. Further away from the origin (and closer to the edge of the disk), objects look smaller (even though they're the same size on the hyperboloid). Angles are preserved, so (for instance) two lines that appear to be perpendicular when measured by Euclidean standards actually are perpendicular. 
+
+<hr style="clear:right;"/>
+
+Okay. Long-winded math over, let's start folding things. Like the previous post, we're going to be mirroring pixels across a boundary. In this case, we are going to keep track of the number of times each point is actually moved by a folding operation. If a point is folded, we increment a variable; once we're done, we use the value to color the pixel.
+<br/><br/>
+To begin, we do two folds across the X and Y axes. You can adjust the orientation of the fold axes to see how it behaves. The upper-right quadrant stays black because points there are never moved. Points in the lower left are folded twice, and so are also black. The other two are folded exactly once, so they turn gray.
+
+<div style='clear:right'></div>
+<div class="codeAndCanvas" literate data="void fold(inout vec2 p, vec2 dir,inout int n){
+    float dt = dot(p,dir);
+    if (dt<0.) {
+        p-=2.*dt*dir;
+        n++;
+    }
+}
+vec3 color(vec2 pt) {
+    int n=0;
+    fold(pt,normalize(vec2(1,0)),n);
+    fold(pt,normalize(vec2(0,1)),n);
+    return vec3(fract(float(n)/2.));
+}"></div>
+
+In the Poincaré disk model of hyperbolic geometry, a straight line is drawn as a portion of a generalized circle (generalized, because the center of the circle can be "at infinity", and it looks like a line through the origin). To reflect across a hyperbolic line you actually invert across the circle. Inside the hyperbolic geometry, distances aren't affected by inversion, even if they look like they are in our model. So, using the circle inversion idea, we define a fold "across" a circle. If a point is outside the circle, it is unaffected, but if it is inside, it is "folded" to the outside with a circle inversion.
+<br/><br/>
+Here, we are folding across two lines and a circle. From the point of view of the Poincaré model, all three folds are across straight lines (or, alternatively, there are three circle inversions, and two of the circles have a center at infinity). You could do this with three suitably chosen circles, too.
+
+<div style='clear:right'></div>
+<div class="codeAndCanvas" literate data="vec2 cInverse(vec2 z, vec2 center, float radius){
+    z -= center;
+    return z*radius*radius/dot(z,z) + center;
+}
+void fold_circle(inout vec2 z, vec2 c, float r, inout int n) {
+    if (distance(z,c)>r) return;
+    z = cInverse(z,c,r);
+    n++;
+}
+vec3 drawCircle(vec2 z,vec2 c,float r) {
+    return vec3(smoothstep(distance(z,c)-r,.01,0.));
+}
+vec3 color(vec2 pt) {
+    int n=0;
+    vec2 invCent=vec2(1); float invRad=1.122;
+    vec3 color = drawCircle(pt,invCent,invRad);
+    fold(pt,vec2(1,0),n);
+    fold(pt,vec2(0,1),n);
+    fold_circle(pt,invCent,invRad,n);
+    color *= hsv2rgb(vec3(fract(float(n)/2.)/4.,1.,1.-float(n)/40.));
+    return color;
+}"></div>
+
+Now if we just apply the folds a few more times, a new picture starts to emerge: it's a Poincaré disk! These three folds are actually generating a hyperbolic geometry. Adjust the number of iterations to see how the circle inversions successively copy and smoosh the shapes into a steady progression towards the perimeter. These shapes are all right triangles, and they are all the same shape and size.
+
+<div style='clear:right'></div>
+<div class="codeAndCanvas" literate data="void doFolds(inout vec2 z,vec2 c,float r,inout int n) {              
+    fold(z,vec2(1,0),n);
+    fold(z,vec2(0,1),n);
+    fold_circle(z,c,r,n);
+}
+vec3 color(vec2 pt) {
+    int n=0;
+    vec2 invCent=vec2(1); float invRad=1.122;
+    vec3 color = drawCircle(pt,invCent,invRad);
+    for (int i=0;i<10;i++) {
+        doFolds(pt,invCent,invRad,n);
+    }
+    color *= hsv2rgb(vec3(fract(float(n)/2.)/4.,1.,1.-float(n)/40.));
+    return color;
+}"></div>
+
+In the Poincaré disk model, not every arc is a straight line: it has to be perpendicular to the edge of the disk. So you'll notice that as you move the inverting circle, the generated disk shifts and changes shape. With some more math, you can work back from the disk to find circles that will generate it. Many choices of circle don't result in a uniform tiling at all. More math can tame this as well, and generate tilings based on how many tiles should fit around each vertex. 
+<br/><br/>
+You might have noticed that the picture changes quite a lot if the inverting circle actually includes the origin. The tiling suddenly doesn't approach a limit: it fills the entire plane with a finite number of tiles. The geometric reason is simply that, if you start inside a circle, the inversion will make the tile bigger and bigger, rather than smaller and smaller (like it did when the origin was outside the circle). The result here is actually a model of spherical geometry, and we've generated a tiling of the sphere. Conveniently, reflections in spherical geometry are also modeled by circle inversions in the plane.
+
+<div style='clear:right'></div>
+<div class="codeAndCanvas" literate data="vec3 color(vec2 pt) {
+    int n=0;
+    pt *= 2.;
+    vec2 invCent=vec2(1); float invRad=2.00;
+    vec3 color = drawCircle(pt,invCent,invRad);
+    for (int i=0;i<3;i++) {
+        doFolds(pt,invCent,invRad,n);
+    }
+    color *= hsv2rgb(vec3(fract(float(n)/2.)/4.,1.,1.-float(n)/40.));
+    return color;
+}"></div>
+<div style='clear:right'></div>
+
+When the origin is exactly on the circumference of the circle, we get a third case. There are an infinite number of tiles, but unlike the hyperbolic case, they march towards the origin. This looks pretty unfamiliar. It's definitely not spherical, and it doesn't look much like the hyperbolic pictures we had either. 
+
+<div class="codeAndCanvas" literate data="vec3 color(vec2 pt) {
+    int n=0;
+    vec2 invCent=vec2(sqrt(.5)); float invRad=1.;
+    vec3 color = drawCircle(pt,invCent,invRad);
+    for (int i=0;i<10;i++) {
+        doFolds(pt,invCent,invRad,n);
+    }
+    color *= hsv2rgb(vec3(fract(float(n)/2.)/4.,1.,1.-float(n)/40.));
+    return color;
+}"></div>
+<div style='clear:right'></div>
+
+Surprise! It's actually a circle inverted flat tiling. If we invert our coordinate system, we can recover a flat tiling. Remember than this was generated by inverting around a circle with a circumference that intersected the origin. Circles through the origin are straight lines under circle inversion, and vice versa, so that's why iterating the inversion through our circle generated the inverse of a flat tiling. So an ordinary reflection across a line can be thought of as a special case of an inversion across a circle.
+
+<div class="codeAndCanvas" literate data="vec3 color(vec2 pt) {
+    int n=0;
+    pt = cInverse(pt*3.,vec2(0),1.);
+    vec2 invCent=vec2(sqrt(.5)); float invRad=1.;
+    vec3 color = drawCircle(pt,invCent,invRad);
+    for (int i=0;i<10;i++) {
+        doFolds(pt,invCent,invRad,n);
+    }
+    color *= hsv2rgb(vec3(fract(float(n)/2.)/4.,1.,1.-float(n)/40.));
+    return color;
+}"></div>
+<div style='clear:right'></div>
+
+Now for the magic bit: we can wobble our circle back and forth to generate all three types of tiling! From this perspective, flat Euclidean geometry can be seen quite naturally as sitting on the knife-edge between spherical and hyperbolic.  It transitions between <a href="https://en.wikipedia.org/wiki/Orbifold_notation#/media/File:H2checkers_245.png">[4,5]</a>, <a href="https://en.wikipedia.org/wiki/Tetrakis_square_tiling#Symmetry">[4,4]</a> and <a href="https://en.wikipedia.org/wiki/Octahedral_symmetry">[4,3]</a> tilings (in <a href="https://en.wikipedia.org/wiki/Coxeter_notation">Coxeter notation</a>).
+
+<div class="codeAndCanvas" literate data="vec3 color(vec2 pt) {
+    int n=0;
+    pt = cInverse(pt*3.,vec2(0),1.);
+    vec2 invCent=vec2(sqrt(.5));
+    invCent.x += mix(-0.054,0.1,sin(u_time));
+    float invRad=1.;
+    vec3 color = drawCircle(pt,invCent,invRad);
+    for (int i=0;i<10;i++) {
+        doFolds(pt,invCent,invRad,n);
+    }
+    color *= hsv2rgb(vec3(fract(float(n)/2.)/4.,1.,1.-float(n)/40.));
+    return color;
+}"></div>
+<div style='clear:right'></div>
+
+You can do the same with the other flat tiling; here,  it transitions between <a href="https://en.wikipedia.org/wiki/Icosahedral_symmetry">[5,3]</a>, <a href="https://en.wikipedia.org/wiki/Orbifold_notation#/media/File:Tile_V46b.svg">[6,3]</a> and <a href="https://en.wikipedia.org/wiki/3-7_kisrhombille#Symmetry">[7,3]</a> tilings.
+
+<div class="codeAndCanvas" literate data="vec3 color(vec2 pt) {
+    int n=0;
+    pt = cInverse(pt*4.5,vec2(0),1.);
+    vec2 invCent=vec2(sqrt(3.)/2.,.5);
+    invCent.x += mix(-0.011,0.035,sin(u_time));
+    float invRad=1.;
+    for (int i=0;i<20;i++) {
+        doFolds(pt,invCent,invRad,n);
+    }
+    return hsv2rgb(vec3(fract(float(n)/2.)/4.,1.,1.-float(n)/40.));
+}"></div>
+<div style='clear:right'></div>
+
+
+That's all for now. In my next post I will explore translating, rotating, and generally splashing about inside hyperbolic geometry. In the meantime, feel free to play with hyperbolic tilings <a href="http://roy.red/editor/#/shaders/poincare-disk-fold.frag">in the editor here</a>. If you want to play with a more fully-featured environment, I recommend this <a href="http://gratrix.net/tile/tile.html">tiling generator</a>.
+  </div>
+  <div class="tag-cloud">
+    <p>
+    </p>
+  </div>
+</article>
+
+    <footer>
+        <p>&copy; Roy Wiggins </p>
+<p>Built using <a href="http://getpelican.com" target="_blank">Pelican</a> - <a href="https://github.com/alexandrevicenzi/flex" target="_blank">Flex</a> theme by <a href="http://alexandrevicenzi.com" target="_blank">Alexandre Vicenzi</a></p>    </footer>
+  </main>
+
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BlogPosting",
+  "name": "Folding Animated Hyperbolic & Spherical Tilings",
+  "headline": "Folding Animated Hyperbolic & Spherical Tilings",
+  "datePublished": "2017-04-12 15:46:52-07:00",
+  "dateModified": "",
+  "author": {
+    "@type": "Person",
+    "name": "Roy Wiggins",
+    "url": "http://roy.red/author/roy-wiggins.html"
+  },
+  "image": "{{ SITEURL }}/{{ THEME_STATIC_DIR }}/img/profile.png",
+  "url": "http://roy.red/folding-tilings-.html",
+  "description": ""
+}
+</script>  
+  <script type="application/javascript" src="http://roy.red/theme/script/main.js"></script>
+</body>
+</html>
