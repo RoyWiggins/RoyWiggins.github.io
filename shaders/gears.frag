@@ -34,8 +34,7 @@ vec3 filledcircle(vec2 c, float r){
 vec3 smoothgear(in vec3 col, vec2 z, float r, float n, float toothHeight){
 	float theta = atan(z.y,z.x);
 	float R = length(z)-r-toothHeight/5.;
-	float val;
-	val = 1.0 - smoothstep(0.,0.01,sin(R)+sin(theta*n)*toothHeight/2.);
+	float val = 1.0 - smoothstep(0.,0.01,sin(R)+sin(theta*n)*toothHeight/2.);
 	val = val+smoothstepr(R-toothHeight/5.,0.01,vec3(0.)).x-1. ;
 	val = clamp(val,0.,1.);
 	val = val+smoothstepr(R+toothHeight/5.,0.01,vec3(0.)).x ;
@@ -60,8 +59,8 @@ vec3 planetGear(in vec3 col, in vec2 z, float sunRadius, float planetRadius,floa
 }
 vec3 planetaryLinkage(vec2 z){
 	vec3 col = vec3(0.);
-    float r1 = 0.5;
-    float r2 = 1.;
+    	float r1 = 0.5;
+   	float r2 = 1.;
 	float secondsPerRotation = 40.;
 	float stime = 360. * u_time/secondsPerRotation;
 	float sunTeeth = 30.;
@@ -181,7 +180,7 @@ void droste(inout vec2 z, float r1, float r2, float Branches, float stretch, flo
 	}
 	float scale = log(r2/r1);
 	float angle = atan(scale/(2.*PI)*Branches);
-	float r;
+	float r = 0.;
 	z = cLog(z);
 
 	z = cDiv(z, cMul(cExp(vec2(0,angle)), vec2(cos(angle),0)));
