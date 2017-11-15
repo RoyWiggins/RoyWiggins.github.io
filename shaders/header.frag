@@ -384,7 +384,7 @@ vec3 lighting2(vec3 pointOnSurface, vec3 surfaceNormal, vec3 lightPosition, vec3
 vec3 simple_raymarch(vec2 uv){
     vec3 cameraPosition = vec3( 0., 0.0, -2.0 );
     vec3 cameraDirection = normalize( vec3( uv.x, uv.y, 1.0) );
-    vec3 pointOnSurface;
+    vec3 pointOnSurface = vec3(0.);
     float distanceToClosestPointInScene = tracer( cameraPosition, cameraDirection, pointOnSurface );
     vec3 finalColor = vec3(0.0);
     if( distanceToClosestPointInScene > 0.0 )
