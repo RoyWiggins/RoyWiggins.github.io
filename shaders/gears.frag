@@ -59,7 +59,7 @@ vec3 planetGear(in vec3 col, in vec2 z, float sunRadius, float planetRadius,floa
 	return smoothgear(col,rotate2(rotate2(z,angle+stime*carrierSpeed)-vec2(sunRadius+planetRadius,0),-(stime+angle) * planetSpeed),planetRadius,planetTeeth,0.13);
 }
 vec3 planetaryLinkage(vec2 z){
-	vec3 col;
+	vec3 col = vec3(0.);
     float r1 = 0.5;
     float r2 = 1.;
 	float secondsPerRotation = 40.;
@@ -204,7 +204,7 @@ void main() {
     st -= .5;
     st.x *= u_resolution.x/u_resolution.y;
     st *= 2.;
-    vec3 color;
+    vec3 color = vec3(0.);
     vec2 uv = st;
     st = st - vec2(1.,0.);
     droste(st,0.5,1.0,1.,1.,0.);
