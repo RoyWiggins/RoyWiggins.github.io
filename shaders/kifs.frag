@@ -116,6 +116,6 @@ vec3 raymarch(vec2 uv){
 void main( void ) 
 {
     vec2 uv = ( gl_FragCoord.xy / u_resolution.xy ) * 2.0 - 1.0;
-    uv.x *= u_resolution.x / u_resolution.y;
-    gl_FragColor = vec4( raymarch(uv), 1.0 );
+    uv.x *= u_resolution.x / u_resolution.y; 
+   gl_FragColor = vec4( raymarch(uv), 1.0 );
 }

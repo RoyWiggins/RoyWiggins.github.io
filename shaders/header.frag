@@ -49,7 +49,7 @@ vec3 circle(vec2 c, float r){
 }
 
 vec3 circles(vec2 z,float r1,float r2){
-    vec3 col;
+    vec3 col = vec3(0);
     addColor(col,vec3(0,1,0),radius(z, r1,r2,0.));
     addColor(col,vec3(0,0,1),radius(z, r1,r2,90.));
     addColor(col,vec3(1,1,0),radius(z, r1,r2,180.));
@@ -277,7 +277,7 @@ vec2 droste_(vec2 z,float r1, float r2) {
 vec3 smoothgear(in vec3 col, vec2 z, float r, float n, float toothHeight){
     float theta = atan(z.y,z.x);
     float R = length(z)-r-toothHeight/5.;
-    float val;
+    float val = 0.;
     val = 1.0 - smoothstep(0.,0.01,sin(R)+sin(theta*n)*toothHeight/2.);
     val = val+smoothstepr(R-toothHeight/5.,0.01,vec3(0.)).x-1. ;
     val = clamp(val,0.,1.);
@@ -288,7 +288,7 @@ vec3 planetGear(in vec3 col, in vec2 z, float sunRadius, float planetRadius,floa
     return smoothgear(col,rotate2(rotate2(z,angle+stime*carrierSpeed)-vec2(sunRadius+planetRadius,0),-(stime+angle) * planetSpeed),planetRadius,planetTeeth,0.13);
 }
 vec3 planetaryLinkage(vec2 z){
-    vec3 col;
+    vec3 col = vec3(0);
     float r1 = 0.5;
     float r2 = 1.;
     float secondsPerRotation = 40.;
