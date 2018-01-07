@@ -21,8 +21,9 @@
 
 &lt;p&gt;The equation for this hyperboloid is &lt;span class="math"&gt;\(x^2 + y^2 - z^2 = 1\)&lt;/span&gt;. Alternatively, you can define it as vectors &lt;span class="math"&gt;\(\vec{a}\)&lt;/span&gt; such that &lt;span class="math"&gt;\(\vec{a} \cdot_{\tiny{H}} \vec{a} = 1\)&lt;/span&gt;. In the ordinary 3-D Euclidean metric, &lt;span class="math"&gt;\(\vec{a} \cdot \vec{a} = 1\)&lt;/span&gt; is a unit sphere. So, this hyperboloid is a sort of "hyperbolic sphere"- it's this space's equivalent of a sphere, the set of all points a unit distance away from the origin. We can draw a 2D version of this easily. Notice that with &lt;code&gt;space = 0&lt;/code&gt;, it "degenerates" into two flat planes.&lt;/p&gt;
 &lt;p&gt;It's important that we are actually flipping the surface so that the two halves of the hyperboloid open vertically up and down, and the Euclidean plane(s) are also in line with the &lt;span class="math"&gt;\(xy\)&lt;/span&gt; plane. It's points on these surfaces that behave like we want. &lt;/p&gt;
-&lt;div class="codeAndCanvas" data="float y = 0.;
-float space = -1.;
+&lt;div class="codeAndCanvas" data="// This is code is 'live'; adjust 'space'
+float y = 0.;
+float space = -1.; // try 0.0 or 1.0
 float dot_(vec3 a, vec3 b) { 
     // Perform either dot product
     return a.x*b.x+a.y*b.y+space*a.z*b.z;
@@ -149,7 +150,8 @@ r &amp;amp;= \left(\frac{1+kR^2}{1+kR^2}+\frac{1-kR^2}{1+kR^2}\right) R \\
 &lt;p&gt;We can pull this into two dimensions easily. &lt;span class="math"&gt;\(R^2 = X^2+Y^2\)&lt;/span&gt;, and doubling &lt;span class="math"&gt;\(R\)&lt;/span&gt; doubles both &lt;span class="math"&gt;\(X\)&lt;/span&gt; and &lt;span class="math"&gt;\(Y\)&lt;/span&gt;, so the final function looks like:&lt;/p&gt;
 &lt;div class="math"&gt;$$ \left(X,Y\right) \mapsto \left(\frac{2X}{1+k\left(X^2+Y^2\right)}, \frac{2Y}{1+k\left(X^2+Y^2\right)}, \frac{1-k\left(X^2+Y^2\right)}{1+k\left(X^2+Y^2\right)}\right)$$&lt;/div&gt;
 &lt;p&gt;Pulling this all together, and out pops the tilings we want. Adjust &lt;code&gt;p,q,r&lt;/code&gt; to see how they behave.&lt;/p&gt;
-&lt;div class="codeAndCanvas" data="float p = 5.; float q=4.; float r=2.;
+&lt;div class="codeAndCanvas" data="// Adjust p, q, r
+float p = 3.; float q=4.; float r=3.;
 float space = float(sign(q*r+p*r+p*q-p*q*r));
 vec3 fold( vec3 p, in vec3 dir, inout int n) {
 // Reflect if we're outside the fundamental region
@@ -183,11 +185,11 @@ vec3 color(vec2 z) {
         w = fold(w,c,n);
     }
     // Return a color based on where you end up
-    return vec3(1.-length(w-vec3(0,0,1.)))*vec3(mod(float(n),3.)*.5,1.,1.);
+    return vec3(2.)*(dot(w,a));
 }"&gt;&lt;/div&gt;
 
 &lt;p&gt;In the hyperbolic case, we can investigate other projections, such as just pulling the point in the plane up to the hyperboloid:&lt;/p&gt;
-&lt;div class="codeAndCanvas" pre="float p = 5.; float q=4.; float r=2.;
+&lt;div class="codeAndCanvas" pre="float p = 3.; float q=4.; float r=3.;
 float space = float(sign(q*r+p*r+p*q-p*q*r));
 vec3 fold( vec3 p, in vec3 dir, inout int n) {
     float dt = dot(p,dir);
@@ -198,25 +200,27 @@ vec3 fold( vec3 p, in vec3 dir, inout int n) {
     return p;
 }
 vec3 calc(vec3 w){
+    // Calculate cutting planes
     float ab = -cos(PI/p);
     float bc = -cos(PI/q);
     float ac = -cos(PI/r);
-    int n=0; int m = 0;
     vec3 a = vec3(1,0,0);
     vec3 b = vec3(ab,sin(PI/p),0.);
     float c0 = ac;
     float c1 = (bc-b[0]*c0)/b[1];
     vec3 c = vec3(c0,c1,sqrt(abs(1.-c0*c0-c1*c1)));
-
     if (space==0.)
         c[2] = .5;
 
+    // Fold across the planes a few times
+    int n=0; int m = 0;
     for (int i=0;i&lt;10;i++){
         w = fold(w,a,m);
         w = fold(w,b,m);
         w = fold(w,c,n);
     }
-    return vec3(1.-length(w-vec3(0,0,1.)))*vec3(mod(float(n),3.)*.5,1.,1.);
+    // Return a color based on where you end up
+    return vec3(2.)*(dot(w,a));
 }" data="vec3 color(vec2 z) {
     z *= 20.;
     vec3 w=vec3(z,sqrt(1.+dot(z,z)));
@@ -256,11 +260,11 @@ vec3 calc(vec3 w){
         w = fold(w,b,m);
         w = fold(w,c,n);
     }
-    return vec3(1.-length(w-vec3(0,0,1.)));
+    return vec3(2.)*(dot(w,a));
 }" data="vec3 color(vec2 z) {
     vec3 w = vec3(2.*z,1.-space*dot(z,z))*1./(1.+space*dot(z,z));
     // Apply hyperbolic rotation
-    float angle = mod(u_time,1.1);
+    float angle = mod(u_time,1.05);
     w.xz = w.xz * mat2(cosh(angle),sinh(angle),
                        sinh(angle),cosh(angle)); 
     return calc(w);
