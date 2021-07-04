@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Shaders on Roy&#39;s blog</title>
-    <link>/shaders/</link>
+    <link>http://roy.red/shaders/</link>
     <description>Recent content in Shaders on Roy&#39;s blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 20 Jul 2016 20:15:16 +0000</lastBuildDate><atom:link href="/shaders/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 20 Jul 2016 20:15:16 +0000</lastBuildDate><atom:link href="http://roy.red/shaders/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>dust</title>
-      <link>/shaders/dust/</link>
+      <link>http://roy.red/shaders/dust/</link>
       <pubDate>Wed, 20 Jul 2016 20:15:16 +0000</pubDate>
       
-      <guid>/shaders/dust/</guid>
+      <guid>http://roy.red/shaders/dust/</guid>
       <description></description>
     </item>
     

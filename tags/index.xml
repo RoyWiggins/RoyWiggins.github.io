@@ -2,35 +2,35 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Tags on Roy&#39;s blog</title>
-    <link>/tags/</link>
+    <link>http://roy.red/tags/</link>
     <description>Recent content in Tags on Roy&#39;s blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 06 Jan 2018 13:27:09 +0000</lastBuildDate><atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 06 Jan 2018 13:27:09 +0000</lastBuildDate><atom:link href="http://roy.red/tags/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>folding</title>
-      <link>/tags/folding/</link>
+      <link>http://roy.red/tags/folding/</link>
       <pubDate>Sat, 06 Jan 2018 13:27:09 +0000</pubDate>
       
-      <guid>/tags/folding/</guid>
+      <guid>http://roy.red/tags/folding/</guid>
       <description></description>
     </item>
     
     <item>
       <title>droste</title>
-      <link>/tags/droste/</link>
+      <link>http://roy.red/tags/droste/</link>
       <pubDate>Wed, 20 Jul 2016 20:15:16 +0000</pubDate>
       
-      <guid>/tags/droste/</guid>
+      <guid>http://roy.red/tags/droste/</guid>
       <description></description>
     </item>
     
     <item>
       <title>drwho, glsl</title>
-      <link>/tags/drwho-glsl/</link>
+      <link>http://roy.red/tags/drwho-glsl/</link>
       <pubDate>Wed, 27 Apr 2016 21:34:06 +0000</pubDate>
       
-      <guid>/tags/drwho-glsl/</guid>
+      <guid>http://roy.red/tags/drwho-glsl/</guid>
       <description></description>
     </item>
     

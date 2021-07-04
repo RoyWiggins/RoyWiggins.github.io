@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Pages on Roy&#39;s blog</title>
-    <link>/pages/</link>
+    <link>http://roy.red/pages/</link>
     <description>Recent content in Pages on Roy&#39;s blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 07 Apr 2016 22:27:56 +0000</lastBuildDate><atom:link href="/pages/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 07 Apr 2016 22:27:56 +0000</lastBuildDate><atom:link href="http://roy.red/pages/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Resources</title>
-      <link>/pages/resources/</link>
+      <link>http://roy.red/pages/resources/</link>
       <pubDate>Thu, 07 Apr 2016 22:27:56 +0000</pubDate>
       
-      <guid>/pages/resources/</guid>
+      <guid>http://roy.red/pages/resources/</guid>
       <description>Tutorials The Book of Shaders Good intro to GLSL fragment shaders in general.
 Raymarching Distance Fields How does raymarching work? This article has an introduction.
 RayMarching 101 Heavily-commented and unobfuscated raymarching examples.
@@ -22,10 +22,10 @@ Synthclipse GLSL shader prototyping tool based on the Eclipse IDE.</description>
     
     <item>
       <title></title>
-      <link>/pages/resume/</link>
+      <link>http://roy.red/pages/resume/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>/pages/resume/</guid>
+      <guid>http://roy.red/pages/resume/</guid>
       <description>Title: Resume Slug: resume Date: 2016-05-04 21:04:56 Tags: Category: Author: Lang: Summary: Status: published
 ContactRoy Wiggins@RoyWigginsGitHubr...@gmail.comSkills Languages Python, C, C#, SQL, JavaScript, Rust, Bash, Forth, Lisp, GLSL, MATLAB, LaTeX, Regular Expressions
 Frameworks &amp;amp; Platforms Flask, jQuery, Underscore, React, Git, Subversion
