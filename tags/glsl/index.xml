@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>glsl on Roy.red</title>
+    <link>http://roy.red/tags/glsl/</link>
+    <description>Recent content in glsl on Roy.red</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 03 Jan 2017 17:34:06 +0000</lastBuildDate>
+    
+	<atom:link href="http://roy.red/tags/glsl/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>3D Kaleidoscopic Fractals: Folding the Koch Snowflake</title>
+      <link>http://roy.red/folding-the-koch-snowflake/</link>
+      <pubDate>Tue, 03 Jan 2017 17:34:06 +0000</pubDate>
+      
+      <guid>http://roy.red/folding-the-koch-snowflake/</guid>
+      <description>How to fold space into a Koch snowflake.</description>
+    </item>
+    
+  </channel>
+</rss>

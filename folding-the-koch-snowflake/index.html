@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-us" lang="en-us">
+<head>
+  <link href="https://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="generator" content="Hugo 0.70.0" />
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>3D Kaleidoscopic Fractals: Folding the Koch Snowflake &middot; Roy.red</title>
+  <meta name="description" content="" />
+
+  
+  <link type="text/css" rel="stylesheet" href="http://roy.red/css/print.css" media="print">
+  <link type="text/css" rel="stylesheet" href="http://roy.red/css/poole.css">
+  <link type="text/css" rel="stylesheet" href="http://roy.red/css/syntax.css">
+  <link type="text/css" rel="stylesheet" href="http://roy.red/css/hyde.css">
+  <link type="text/css" rel="stylesheet" href="http://roy.red/css/glslEditor.css">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Abril+Fatface|PT+Sans:400,400i,700">
+
+
+  
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+  <link rel="shortcut icon" href="/favicon.png">
+
+  
+  <script type="application/javascript" src="/scripts/glslEditor.js"></script>
+  <script type="text/javascript" src="/scripts/GlslCanvas.js"></script>
+  
+  <script type="text/javascript" src="/scripts/main.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+
+    
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+
+    
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"
+        onload='renderMathInElement(document.body, {delimiters:[
+  {left: "$", right: "$", display: false},
+  {left: "@@", right: "@@", display: true},
+]});'></script></script>
+  
+</head>
+
+  <body class="theme-base-08 ">
+  <aside class="sidebar">
+  <div class="container">
+    <div class="sidebar-about">
+      <a href="http://roy.red/"><h1>Roy.red</h1></a>
+      <p class="lead">
+       Roy&#39;s blog 
+      </p>
+    </div>
+
+    <nav>
+      <ul class="sidebar-nav">
+        <li><a href="http://roy.red/">Home</a> </li>
+        <li><a href="https://github.com/RoyWiggins/"> Github </a></li>
+
+        <li><a href="/pages/resources/"> Resources </a></li><li><a href="/pages/resume/">  </a></li>        
+          
+      </ul>
+    </nav>
+
+    <p>&copy; 2020. All rights reserved. </p>
+  </div>
+</aside>
+
+    <main class="content container">
+    <div class="post">
+  <h1>3D Kaleidoscopic Fractals: Folding the Koch Snowflake</h1>
+  <time datetime=2017-01-03T17:34:06Z class="post-date">Tue, Jan 3, 2017</time>
+  <p>I came across a shader that generated a <a href="https://www.shadertoy.com/view/XdcGzH">very pretty version</a> of the <a href="https://en.wikipedia.org/wiki/Koch_snowflake">Koch snowflake</a>. I realized that after stepping through the code that the Koch snowflake is a good, simple example of generating fractals with folds. The code here is in the form of fragment shaders. For a shader primer, check out the <a href="http://thebookofshaders.com/">Book of Shaders</a>. The important thing is that to write a fragment shader, you build a function that takes a location (in our case, of a pixel) and returns a color. All the code here is &ldquo;live&rdquo;, though changes you make in each box will not cascade down to the subsequent ones.</p>
+<p><a href="http://acko.net/blog/how-to-fold-a-julia-fractal/"><img style="float: right;" width="300" src="/images/julia-iter.gif"/></a></p>
+<p>Generating the Koch curve this way is probably among the simplest examples of how fractals can be thought of as a repeated crumpling of space. The animation to the right is borrowed from <a href="http://acko.net/blog/how-to-fold-a-julia-fractal/">a presentation</a> by Steven Wittens that ably demonstrates this with a Julia fractal: squishing, translating and folding space progressively crumples up the boundary of the unit circle.</p>
+<p>For the Koch curve, we need a different sort of fold. It&rsquo;s easiest to understand the folding operation visually. I haven&rsquo;t taken the time to justify this formula, but it&rsquo;s a matter of vector arithmetic. You can adjust the angle to see how it creates a kaleidoscopic effect, reflecting the plane across a line through the origin.</p>
+<div style='clear:right'></div>
+<div class="codeAndCanvas" literate data="vec2 fold(vec2 p, float ang){
+    vec2 n=vec2(cos(-ang),sin(-ang));
+    p-=2.*min(0.,dot(p,n))*n;
+	return p;
+}
+vec3 color(vec2 pt) {
+	// Adjust the angle of the fold here
+    pt=fold(pt,0.284);
+    return vec3(10.*sin(10.*pt.x)*sin(10.*pt.y));
+}"></div>
+<div style='clear:right'></div>
+<p>Now we are going to start drawing a line. This formula calculates the distance to a line segment between $(0,0)$ and $(1,0)$. This is the line we&rsquo;re going to fold up into a Koch curve.</p>
+<div class="codeAndCanvas" literate data="float d2hline(vec2 p){
+    p.x-=max(0.,min(1.,p.x));
+    return length(p)*5.;
+}
+vec3 color(vec2 pt) {
+    pt=pt*2.;
+    return vec3(d2hline(pt));
+}"></div>
+<div style='clear:right'></div>
+<p>There are two folds: first, across the angle $\frac{\pi}{6}$, and then horizontally.</p>
+<div class="codeAndCanvas" literate data="
+vec2 koch_fold(vec2 pt) {
+	// Fold horizontally
+    pt.x = abs(pt.x);
+    pt.x-=.5;
+    //Fold across PI/6
+    pt = fold(pt,PI/6.);
+    return pt;
+}
+vec3 color(vec2 pt) {
+    pt*=2.;
+    pt=koch_fold(pt);
+    return vec3(d2hline(pt));
+}"></div>
+<div style='clear:right'></div>
+<p>We can iterate by moving and scaling the folded line to lie along the original line (from $(0,0)$ to $(0,1)$) and then folding the line up again.</p>
+<div class="codeAndCanvas" literate data="vec3 color(vec2 pt) {
+    pt*=2.;
+    pt=koch_fold(pt); // Fold again
+    // Move it to lie along the (0,1) line
+    pt*=3.;
+    pt.x-=1.5;
+    pt=koch_fold(pt); // Fold once
+    return vec3(d2hline(pt));
+}"></div>
+<div style='clear:right'></div>
+<p>And we can iterate this as many times as we&rsquo;d like. It converges very rapidly, so you only need a handful of folds.</p>
+<div class="codeAndCanvas" literate data="vec2 koch_curve(vec2 pt) {
+    //Fold and scale a few times
+    for(int i=0;i<5;i++){
+        pt*=3.;
+        pt.x-=1.5;
+        pt=koch_fold(pt);
+    }
+    return pt;
+}
+vec3 color(vec2 pt) {
+    pt = pt*.5+.5;
+    pt = koch_curve(pt);
+    return vec3(d2hline(pt)/5.);
+}"></div>
+<div style='clear:right'></div>
+<p>And just for fun, we can do two more folds to create two copies of the curve to create the Koch Snowflake.</p>
+<div class="codeAndCanvas" literate data="vec3 color(vec2 pt) {
+    pt = pt*.7;
+    pt -= vec2(.5,.3);
+    pt = fold(pt,-2.*PI/3.);
+    pt.x += 1.;
+    pt = fold(pt,-PI/3.);
+    pt = koch_curve(pt);
+    return vec3(d2hline(pt)/5.);
+}"></div>
+<p>A small adjustment and we get another familiar fractal, a Sierpinski triangle, or close enough. I recommend you adjust the number of iterations to get a feel for how it converges.</p>
+<div class="codeAndCanvas" literate data="
+vec2 tri_fold(vec2 pt) {
+    pt = fold(pt,PI/6.);
+    pt = fold(pt,-PI/6.);
+    return pt;
+}
+vec2 tri_curve(vec2 pt) {
+    for(int i=0;i<7;i++){
+        pt*=2.;
+        pt.x-=1.;
+        pt=tri_fold(pt);
+    }
+    return pt;
+}
+vec3 color(vec2 pt) {
+    pt -= vec2(-1,.1);
+    pt *= .5;
+    pt = tri_curve(pt);
+    return vec3(d2hline(pt)/7.);
+}"></div>
+<p>You might have worked this out already: I&rsquo;ve been keeping something from you. The real motivation here is to justify a wider class of fractals, dubbed Kaleidoscopic Iterated Function Systems, or KIFS. KIFS are what you get when you start folding and scaling around different axes. A myriad of fractals fall out, and you can see why they&rsquo;re called Kaleidoscopic- for the mirroring folds they&rsquo;re built out of. Here&rsquo;s an example. These reward fiddling: adjust the parameters to get a slightly better sense of how the folds affect the final output.</p>
+<div class="codeAndCanvas" literate data="vec2 gen_fold(vec2 pt) {
+    pt = fold(pt,-2.9);
+    pt = fold(pt,.9);
+    pt.y+=sin(u_time)+1.;
+    pt = fold(pt,-1.0);
+    return pt;
+}
+vec2 gen_curve(vec2 pt) {
+    for(int i=0;i<9;i++){
+        pt*=2.;
+        pt.x-=1.;
+        pt=gen_fold(pt);
+    }
+    return pt;
+}
+vec3 color(vec2 pt) {
+    pt -= vec2(-0.630,0.000);
+    pt *= .8;
+    pt = gen_curve(pt);
+    return vec3(d2hline(pt)/6.);
+}"></div>
+<p>Another confession: In truth, we haven&rsquo;t just been building a black and white image. We&rsquo;ve been calculating a 2D distance estimator to the fractal. For any point in the plane, the value of our function is an approximation of the distance to the fractal. We can illustrate it by taking the modulo of the value:</p>
+<div class="codeAndCanvas" literate data="vec3 color(vec2 pt) {
+    pt = pt*.7;
+    pt += vec2(.5,0.);
+    pt = koch_curve(pt);
+    return vec3(mod(d2hline(pt)/70.,1.));
+}"></div>
+<p>Final confession: this distance estimator? It&rsquo;s not useful. At least, not in 2D. But it&rsquo;s <em>exactly</em> what we need to draw pictures of three-dimensional KIFS fractals. <a href="http://9bitscience.blogspot.com/2013/07/raymarching-distance-fields_14.html">Raymarching</a> is a rendering tool that can render pretty much any surface if you have an estimate of the distance to the surface from any point in space.</p>
+<p>All we need to adjust is adding some folds that live inside the $yz$ plane, rather than keeping in the $xy$ plane. Taking that distance estimate and plugging it into a raymarcher, we get similar 3D fractals! Try adjusting the fold angles to get a sense of the sorts of shapes this is capable of.</p>
+<div class="codeAndCanvas" literate override="DE" data="vec3 tri_fold(vec3 pt) {
+    pt.xy = fold(pt.xy,PI/3.-cos(u_time)/10.);
+    pt.xy = fold(pt.xy,-PI/3.);
+    pt.yz = fold(pt.yz,-PI/6.+sin(u_time)/2.);
+    pt.yz = fold(pt.yz,PI/6.);
+    return pt;
+}
+vec3 tri_curve(vec3 pt) {
+    for(int i=0;i<7;i++){
+        pt*=2.;
+        pt.x-=2.6;
+        pt=tri_fold(pt);
+    }
+    return pt;
+}
+float DE(vec3 p){
+    p *= .75;
+    p.x+=1.5;
+    p=tri_curve(p);
+    return (length( p*.004 ) - .01);
+}
+vec3 color(vec2 pt) {
+    return simple_raymarch(pt);
+}"></div>
+<p>You can play with the full source to this fractal <a href="http://roy.red/editor/#/shaders/kifs.frag">here</a>. This is a very simple and unoptimized renderer, and I&rsquo;m not adept enough at writing raymarchers to tune it perfectly. More sophisticated and well-tuned renderers can draw much prettier pictures!</p>
+<p>For more information you should check out my main source for this post, Mikael Hvidtfeldt Christensen&rsquo;s <a href="http://blog.hvidtfeldts.net/index.php/2011/06/distance-estimated-3d-fractals-part-i/">series on distance estimated 3D fractals</a>, which covers KIFS and more. His program Fragmentarium comes with a number of KIFS fractals built in, and produces some very pretty results.</p>
+
+</div>
+
+
+    </main>
+
+    
+      
+    
+  </body>
+</html>

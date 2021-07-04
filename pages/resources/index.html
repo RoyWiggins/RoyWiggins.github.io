@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-us" lang="en-us">
+<head>
+  <link href="https://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="generator" content="Hugo 0.78.1" />
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Resources &middot; Roy&#39;s blog</title>
+  <meta name="description" content="" />
+
+  
+  <link type="text/css" rel="stylesheet" href="css/print.css" media="print">
+  <link type="text/css" rel="stylesheet" href="css/poole.css">
+  <link type="text/css" rel="stylesheet" href="css/syntax.css">
+  <link type="text/css" rel="stylesheet" href="css/hyde.css">
+  <link type="text/css" rel="stylesheet" href="css/glslEditor.css">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Abril+Fatface|PT+Sans:400,400i,700">
+  <link href="//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic" rel="stylesheet" type="text/css">
+
+  
+  
+
+  
+  <script type="application/javascript" src="/scripts/glslEditor.js"></script>
+  <script type="text/javascript" src="/scripts/GlslCanvas.js"></script>
+  
+  <script type="text/javascript" src="/scripts/main.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+
+    
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+
+    
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"
+        onload='renderMathInElement(document.body, {delimiters:[
+  {left: "$", right: "$", display: false},
+  {left: "@@", right: "@@", display: true},
+]});'></script></script>
+  
+</head>
+
+  <body class="theme-base-08 ">
+  <aside class="sidebar">
+  <div class="container">
+    <div class="sidebar-about">
+      <a href=""><h1>Roy&#39;s blog</h1></a>
+      <p class="lead">
+         
+      </p>
+    </div>
+
+    <nav>
+      <ul class="sidebar-nav">
+        <li><a href="">Home</a> </li>
+        <li><a href="https://github.com/RoyWiggins/"> Github </a></li><li><a href="/editor"> Shader Editor </a></li><li><a href="https://twitter.com/RoyWiggins/"> Twitter </a></li>
+
+        <li><a href="/pages/resources/"> Resources </a></li><li><a href="/pages/resume/">  </a></li>        
+          
+      </ul>
+    </nav>
+
+    
+  </div>
+</aside>
+
+    <main class="content container">
+    <div class="post">
+  <h1>Resources</h1>
+  <h2 id="tutorials">Tutorials</h2>
+<p><a href="http://thebookofshaders.com/">The Book of Shaders</a> Good intro to GLSL fragment shaders in general.</p>
+<p><a href="http://9bitscience.blogspot.com/2013/07/raymarching-distance-fields_14.html">Raymarching Distance Fields</a> How does raymarching work? This article has an introduction.</p>
+<p><a href="http://xdpixel.com/ray-marching-101-part-1/">RayMarching 101</a> Heavily-commented and unobfuscated raymarching examples.</p>
+<h2 id="glsl-tools">GLSL tools</h2>
+<p><a href="https://syntopia.github.io/Fragmentarium/index.html">Fragmentarium</a> Pixel shader playground. Shadertoy on the desktop, except you can also add UI elements (sliders, etc) to adjust uniforms on-the-fly. Really really good. Dive into mandelbulbs, render Droste images, fly through hyperbolic spaces.</p>
+<p><a href="http://synthclipse.sourceforge.net/">Synthclipse</a> GLSL shader prototyping tool based on the Eclipse IDE. Explicitly modeled on Fragmentarium, designed to be a more capable successor.</p>
+<p><a href="http://polycu.be/">PolyCube</a> Another flavor of GLSL toy, this uses a C-like &ldquo;<a href="http://polycu.be/ricescript.html">RiceScript</a>&rdquo; rather than plain GLSL, which has simple automatic typing of variables and other conveniences.</p>
+<p><a href="http://stack.gl/">Stack.gl</a> A module system for GLSL that lets you #include code from npm. You can use try live at <a href="http://glslb.in/">glslb.in</a>.</p>
+<p><a href="http://www.geisswerks.com/gpucaster/index.html">GPUCaster</a> A one-man personal project to enable fiddling about with GLSL raymarched scenes. Define an isosurface, and it renders it. Idiosyncratic, but interesting.</p>
+<p><a href="http://tobyschachman.com/Shadershop/">ShaderShop</a> Interactive GLSL function builder. iq&rsquo;s <a href="http://www.iquilezles.org/apps/graphtoy/">Graph Toy</a> is more straightforward, especially if you already have a function you want to draw.</p>
+<p><a href="https://github.com/daeken/Shaderforth">Shaderforth</a>. Tired of writing GLSL shaders? This thing builds a little Forth language that compiles to GLSL. Is this useful? Who knows!</p>
+<p><a href="https://github.com/overtone/shadertone">Shadertone</a> Shaders + Sound, in Clojure. Includes a Lispy-&gt;GLSL translator.</p>
+<h2 id="art-tools">Art tools</h2>
+<p><a href="http://www.softology.com.au/voc.htm">Visions of Chaos</a> Open source application for rendering a <em>vast</em> number of different kinds of generative images. Fractals, attractors, cellular automata, reaction-diffusion, and comes with a large collection of GLSL shaders that render different things.</p>
+<p><a href="http://structuresynth.sourceforge.net/">Structure Synth</a> Grammar-driven generative 3D art software.</p>
+<p><a href="http://www.contextfreeart.org/">Context Free Art</a> Grammar-driven generative 2D art software.</p>
+<p><a href="http://www.knotplot.com/">Knot Plot</a> NOT FREE. Plot knots!</p>
+<p><a href="https://github.com/thi-ng/morphogen/">Morphogen</a>. Something like Structure Synth, except in Clojure. Open source and written in a literate programming style. Not as easy to install and use, but maybe more powerful? Not sure.</p>
+<p><a href="http://www.flamingpear.com/flexify-2.html">Flexify 2</a>. NOT FREE. Photoshop plugin for reprojecting 360-degree panoramas. Claims to handle 330 separate projections! The results are very pretty, but it costs money.</p>
+<p><a href="https://sourceforge.net/projects/gsolaar/">gSolaar</a>. Print out paper models of custom polyhedra and assemble them.</p>
+<p><a href="http://www.xenodream.com/xenodream1.htm">XenoDream</a>. NOT FREE. Interactive 3D fractal IFS generator/renderer. There&rsquo;s a trial version.</p>
+<p><a href="http://chaoticafractals.com/">Chaotica</a> NOT FREE. Generous trial for non-commercial use and small renders. Renders fractals based on the Fractal Flame algorithm.</p>
+<p><a href="https://voxel.codeplex.com/">MagicaVoxel</a> Pretty voxel editor and renderer.</p>
+<h2 id="math-tools-and-toys">Math Tools and Toys</h2>
+<p><a href="https://www.desmos.com/">Desmos</a> Online graphic calculator. Plot stuff, adjust parameters, you know the drill.</p>
+<p><a href="http://geometrygames.org/">Geometry Games by Jeff Weeks</a>. Games and tools for tesselation, visualizing spaces, a four-dimensional maze game, and more. Games on toruses and hyperbolic surfaces!</p>
+<p><a href="http://www.math.cmu.edu/~fho/jenn/">Jenn3D</a> Software for visualizing higher-dimensional polytopes.</p>
+<h2 id="libraries">Libraries</h2>
+<p><a href="http://toxiclibs.org/">toxiclibs</a>. A framework for Processing (and Java) designed to help out with drawing generative stuff.</p>
+<p><a href="http://www.math.uic.edu/t3m/SnapPy/">SnapPy</a> is based on software by Jeff Weeks. Fun with 3-manifolds, programmed in python. Haven&rsquo;t played with this yet but looks <em>extremely</em> interesting.</p>
+<p><a href="http://www.lifl.fr/~decomite/anamorphoses/generalMethod.html">Anamorphoses</a> Generate anamorphic images with arbitrary mirrors! In theory, anyway.</p>
+<p><a href="http://threejs.org/">Three.js</a></p>
+<h2 id="mesh-modelling">Mesh Modelling</h2>
+<p><a href="http://k3dsurf.sourceforge.net/">K3DSurf</a> Render isosurfaces and parametric surfaces, in 3 dimensions and higher.</p>
+<p><a href="http://www.cs.technion.ac.il/~gershon/GuIrit/">GuIRIT</a> A programmatic modelling system based on surfaces and operations on surfaces.</p>
+<p><a href="http://www.viz.tamu.edu/faculty/ergun/research/topology/download.html">TopMod</a>. Facilitates topological mesh modelling. Implements a couple dozen subdivision algorithms, and lets you build surfaces by adding handles and extruding bits.</p>
+<p><a href="http://www.wings3d.com/">Wings3D</a> Freeform subdivision modeler, written in Erlang(!) Been around forever. See also <a href="http://manifoldlab.com">ManifoldLab</a>, an extension for Wings3D. Allows operations on manifolds, I guess? I haven&rsquo;t used it yet.</p>
+<p><a href="http://www.antiprism.com/">Antiprism</a> Polyhedra modelling software</p>
+<p><a href="http://facstaff.susqu.edu/b/brakke/evolver/evolver.html">Surface Evolver</a> &ldquo;an interactive program for the modelling of liquid surfaces shaped by various forces and constraints&rdquo;. Looks promising (the webpage is in Comic Sans, how can it not be good?), but I haven&rsquo;t used it yet.</p>
+<h2 id="other-stuff">Other stuff</h2>
+<p><a href="https://imaginary.org/">Imaginary.org</a> A website devoted to &ldquo;open and interactive mathematics&rdquo;. Lots of visuals here, for instance <a href="http://imaginary.org/program/surfer">SURFER</a>.</p>
+<p><a href="http://aprt.us/">Apparatus</a> Also by Toby Schachman, this a web tool is for building interactive mathematical diagrams.</p>
+<p><a href="https://www.complang.tuwien.ac.at/schani/mathmap/">MathMap</a> Perform arbitrary mathematical transformations in the Gimp image editor. Anything Flexify can do, MathMap might be able to&hellip; but you&rsquo;ll have to find or write the algorithm yourself. Has its own language, so you&rsquo;ll have to learn that too. Seems nearly abandoned. Here&rsquo;s a <a href="http://www.people.fas.harvard.edu/~reichard/mathmap/Quincuncial.mm.txt">quincuncial projection</a> for it, and <a href="http://photocomix-resources.deviantart.com/art/MathMap-custom-script-2-1-83507321">some more scripts</a>.</p>
+<p><a href="http://gmic.eu/">G&rsquo;MIC</a> It&rsquo;s a spiritual successor to MathMap and probably the one to use.</p>
+<h2 id="bits-and-pieces">Bits and pieces</h2>
+<p><a href="https://www.shadertoy.com/view/lslXW8">paniq&rsquo;s Shader Drawing Library</a>. For drawing 2D stuff in fragment shaders.</p>
+<p><a href="https://www.flickr.com/photos/lloydb/7888985138/in/photostream/">Pentasplat projection</a>.</p>
+<p><a href="http://blog.hvidtfeldts.net/index.php/2012/02/distance-estimated-polychora/">Polychora in Fragmentarium</a>. Pretty, stereographic projections of convex regular polytopes.</p>
+<p><a href="http://escherdroste.math.leidenuniv.nl/">Applying mathematics to Escher&rsquo;s Print Gallery</a>. This website and accompanying paper try to explain how the Print Gallery transformation (&ldquo;Droste Effect&rdquo;) works.</p>
+<p><a href="http://www.josleys.com/index.php">Jos Leys' Mathematical Imagery</a>.</p>
+<p><a href="http://www.engare.design">Engare</a> A game (in development) based around spirography generative art. Very pretty, very exciting.</p>
+<p><a href="http://www.bugman123.com">Bugman&rsquo;s art</a> Lots of interesting mathematical art on this personal page.</p>
+<p><a href="http://www.fractalforums.com">Fractalforums</a> Covers all aspects of fractals, generative art, etc. The <a href="http://www.fractalforums.com/ifs-iterated-function-systems/">IFS subforum</a> is particularly interesting.</p>
+
+</div>
+    </main>
+
+    
+      
+    
+  </body>
+</html>

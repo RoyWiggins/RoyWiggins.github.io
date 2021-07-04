@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>folding on Roy&#39;s blog</title>
+    <link>/tags/folding/</link>
+    <description>Recent content in folding on Roy&#39;s blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 06 Jan 2018 13:27:09 +0000</lastBuildDate><atom:link href="/tags/folding/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Uniting spherical and hyperbolic tilings</title>
+      <link>/posts/uniting-spherical-and-hyperbolic-tilings/</link>
+      <pubDate>Sat, 06 Jan 2018 13:27:09 +0000</pubDate>
+      
+      <guid>/posts/uniting-spherical-and-hyperbolic-tilings/</guid>
+      <description>In my previous post, I explored generating hyperbolic, euclidean and spherical tilings using circle inversions. While it produced interesting pictures and animations, I wasn&amp;rsquo;t able to derive a formula to generate particular tilings. There&amp;rsquo;s another way to generate tilings that admits a beautifully simple unification of the three geometries. We will need a bit more machinery, but the result is interesting and approaches the problem in a different way. This post is based nearly entirely on Knighty&amp;rsquo;s shader with some help from notes the author left on fractalforums.</description>
+    </item>
+    
+    <item>
+      <title>Folding Animated Hyperbolic &amp; Spherical Tilings</title>
+      <link>/posts/folding-tilings/</link>
+      <pubDate>Wed, 12 Apr 2017 15:46:52 +0000</pubDate>
+      
+      <guid>/posts/folding-tilings/</guid>
+      <description>In a previous post, I talked about generating interesting pictures by iterated folding operations. In this post I&amp;rsquo;m going to use another type of fold to draw both hyperbolic and spherical tilings. If you are already familiar with hyperbolic geometry and tilings, skip the next few paragraphs! There&amp;rsquo;s code down at the bottom.
+In order to simplify what we&amp;rsquo;re talking about, we can limit ourselves to tilings of right-angled triangles. In the Euclidean plane, there are two ways to tile the plane this way.</description>
+    </item>
+    
+    <item>
+      <title>3D Kaleidoscopic Fractals: Folding the Koch Snowflake</title>
+      <link>/posts/folding-the-koch-snowflake/</link>
+      <pubDate>Tue, 03 Jan 2017 17:34:06 +0000</pubDate>
+      
+      <guid>/posts/folding-the-koch-snowflake/</guid>
+      <description>How to fold space into a Koch snowflake.</description>
+    </item>
+    
+  </channel>
+</rss>

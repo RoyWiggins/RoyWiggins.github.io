@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-us" lang="en-us">
+<head>
+  <link href="https://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="generator" content="Hugo 0.70.0" />
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Fun with interference patterns &middot; Roy.red</title>
+  <meta name="description" content="" />
+
+  
+  <link type="text/css" rel="stylesheet" href="http://roy.red/css/print.css" media="print">
+  <link type="text/css" rel="stylesheet" href="http://roy.red/css/poole.css">
+  <link type="text/css" rel="stylesheet" href="http://roy.red/css/syntax.css">
+  <link type="text/css" rel="stylesheet" href="http://roy.red/css/hyde.css">
+  <link type="text/css" rel="stylesheet" href="http://roy.red/css/glslEditor.css">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Abril+Fatface|PT+Sans:400,400i,700">
+
+
+  
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+  <link rel="shortcut icon" href="/favicon.png">
+
+  
+  <script type="application/javascript" src="/scripts/glslEditor.js"></script>
+  <script type="text/javascript" src="/scripts/GlslCanvas.js"></script>
+  
+  <script type="text/javascript" src="/scripts/main.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+
+    
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+
+    
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"
+        onload='renderMathInElement(document.body, {delimiters:[
+  {left: "$", right: "$", display: false},
+  {left: "@@", right: "@@", display: true},
+]});'></script></script>
+  
+</head>
+
+  <body class="theme-base-08 ">
+  <aside class="sidebar">
+  <div class="container">
+    <div class="sidebar-about">
+      <a href="http://roy.red/"><h1>Roy.red</h1></a>
+      <p class="lead">
+       Roy&#39;s blog 
+      </p>
+    </div>
+
+    <nav>
+      <ul class="sidebar-nav">
+        <li><a href="http://roy.red/">Home</a> </li>
+        <li><a href="https://github.com/RoyWiggins/"> Github </a></li>
+
+        <li><a href="/pages/resources/"> Resources </a></li><li><a href="/pages/resume/">  </a></li>        
+          
+      </ul>
+    </nav>
+
+    <p>&copy; 2020. All rights reserved. </p>
+  </div>
+</aside>
+
+    <main class="content container">
+    <div class="post">
+  <h1>Fun with interference patterns</h1>
+  <time datetime=2016-05-04T21:04:56Z class="post-date">Wed, May 4, 2016</time>
+  <p>Ordinary trigonometric functions can produce really interesting, structured patterns if you use sufficiently large numbers. There&rsquo;s nothing fancy happening here, but at different scales and with different constants, the result can change quite drastically. Try zooming in (<code>z = z * 0.01</code> for instance) and you&rsquo;ll see that it&rsquo;s just bands of white and black. It&rsquo;s only when you zoom out that creeping bands moving in crazy directions appear.</p>
+<div class="codeAndCanvas" data="vec3 color(vec2 z) {
+    z = z * 1.;
+    float r=length(z);
+    return vec3(sin(cos(r)*r*(u_time+1000.)*10.0));
+}"></div>
+<p>I&rsquo;m fairly sure this is a straightforward consequence of interference. The square grid of pixels is sampling the underlying equation at regular intervals. The result is a kind of <a href="https://en.wikipedia.org/wiki/Moir%C3%A9_pattern">moiré pattern</a>. For photography and graphics applications aliasing is Bad News, but you can harness it to produce interesting patterns.</p>
+<div style='clear:right'></div>
+<p>Anyway, math aside, you can pretty much just start messing with constants and mushing trigonometric functions together here and see what happens. It inherits some of the rotational symmetry of the underlying pattern, so we end up with something that isn&rsquo;t completely mush. Plugging the time variable into a periodic function like <code>sin</code> lets us quite easily find interesting loops, ripe for the giffing.</p>
+<div class="codeAndCanvas" data="vec3 color(vec2 pt) {
+    pt = pt * 1.6;
+    float r = length(pt);
+    float stime = 4.*sin(u_time * 2. * PI)+100.;
+    return vec3(r+cos(cos(r*r*100.)*stime));
+}"></div>
+<div style='clear:right'></div>
+<p>My current &ldquo;fancy&rdquo; way to gif something is to render it in <a href="https://syntopia.github.io/Fragmentarium/index.html">Fragmentarium</a> and take the resulting pngs and run them through <a href="https://www.imagemagick.org/script/index.php">ImageMagick</a>&lsquo;s <code>convert</code> utility. This is a bit fiddly, so often I just use my favorite program: <a href="http://blog.bahraniapps.com/gifcam/">GifCam</a>! It&rsquo;s a tiny utility that records gifs directly off your screen. It certainly won&rsquo;t produce the best, smallest, lowest-artifact gif, but it&rsquo;s easy to use and the results aren&rsquo;t half bad!</p>
+<img width="250" src="/images/interference-1.gif"/>
+<img width="250" src="/images/circles_m.gif"/>
+<img width="250" src="/images/mandala2.gif"/>
+
+</div>
+
+
+    </main>
+
+    
+      
+    
+  </body>
+</html>

@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-us" lang="en-us">
+<head>
+  <link href="https://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="generator" content="Hugo 0.78.1" />
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Implementing the Droste effect in WebGL &middot; Roy&#39;s blog</title>
+  <meta name="description" content="" />
+
+  
+  <link type="text/css" rel="stylesheet" href="css/print.css" media="print">
+  <link type="text/css" rel="stylesheet" href="css/poole.css">
+  <link type="text/css" rel="stylesheet" href="css/syntax.css">
+  <link type="text/css" rel="stylesheet" href="css/hyde.css">
+  <link type="text/css" rel="stylesheet" href="css/glslEditor.css">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Abril+Fatface|PT+Sans:400,400i,700">
+  <link href="//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic" rel="stylesheet" type="text/css">
+
+  
+  
+
+  
+  <script type="application/javascript" src="/scripts/glslEditor.js"></script>
+  <script type="text/javascript" src="/scripts/GlslCanvas.js"></script>
+  
+  <script type="text/javascript" src="/scripts/main.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+
+    
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+
+    
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"
+        onload='renderMathInElement(document.body, {delimiters:[
+  {left: "$", right: "$", display: false},
+  {left: "@@", right: "@@", display: true},
+]});'></script></script>
+  
+</head>
+
+  <body class="theme-base-08 ">
+  <aside class="sidebar">
+  <div class="container">
+    <div class="sidebar-about">
+      <a href=""><h1>Roy&#39;s blog</h1></a>
+      <p class="lead">
+         
+      </p>
+    </div>
+
+    <nav>
+      <ul class="sidebar-nav">
+        <li><a href="">Home</a> </li>
+        <li><a href="https://github.com/RoyWiggins/"> Github </a></li><li><a href="/editor"> Shader Editor </a></li><li><a href="https://twitter.com/RoyWiggins/"> Twitter </a></li>
+
+        <li><a href="/pages/resources/"> Resources </a></li><li><a href="/pages/resume/">  </a></li>        
+          
+      </ul>
+    </nav>
+
+    
+  </div>
+</aside>
+
+    <main class="content container">
+    <div class="post">
+  <h1>Implementing the Droste effect in WebGL</h1>
+  <time datetime=2016-04-25T22:33:23Z class="post-date">Mon, Apr 25, 2016</time>
+  <p><noscript><h3>Hi! It looks like you&rsquo;ve turned off Javascript. I&rsquo;m sorry to say that WebGL and math rendering require Javascript, so this post will appear broken with Javascript turned off.</h2></noscript></p>
+
+
+
+
+
+
+
+
+
+
+<figure  style="float:right"><a href="Droste.jpg">
+    <img src="/posts/droste/Droste_huf91d69421f39f866a2ecc6a8ef94e20a_37825_200x0_resize_q75_box.jpg"/> </a>
+</figure>
+<p>In this post, I&rsquo;m going to explore how to implement the so-called &ldquo;<a href="https://en.wikipedia.org/wiki/Droste_effect">Droste effect</a>.&rdquo; The Droste effect is a name given to pictures that contain themselves, like an infinite series of nesting dolls. The conventional Droste effect is interesting, but it was taken to new heights by M.C. Escher&rsquo;s &ldquo;Print Gallery.&rdquo;</p>
+
+
+
+
+
+
+
+
+<figure  style="float:left"><a href="http://escherdroste.math.leidenuniv.nl/images/scan450.jpg">
+    <img src="/posts/droste/print-gallery_hu82bd7da65333222519910f3377ea95f5_13064_200x0_resize_q75_box.jpg" width="200"/> </a>
+</figure>
+<!-- <a href="http://escherdroste.math.leidenuniv.nl/images/scan450.jpg"><img style="float: left; margin-right:1em; margin-bottom:0.5em" src="/images/print-gallery.jpg"></a> -->
+<p>The Print Gallery has the peculiar quality that if you follow the gaze of the person in the lower right corner, into the picture he is looking at, and around the image clockwise you find that you have come back to where you started: looking at a figure, looking at a picture. In some sense, this is a &ldquo;Droste&rdquo; picture: the print gallery contains a picture of the city that the print gallery is located in, except &ldquo;zooming in&rdquo; is replaced by walking around the origin.</p>
+<p><a href="http://escherdroste.math.leidenuniv.nl/">Mathematicians and artists in the Netherlands</a> managed to reverse-engineer the picture, and determined a transformation that can take an ordinary Droste image to a <a href="https://www.flickr.com/search/?text=droste%20effect">twisted, Escher-like image</a>. They published an <a href="http://www.ams.org/notices/200304/fea-escher.pdf">article</a> explaining how it works, but on first and second reading I will admit I could make neither head nor tails of it. If it makes more sense to you, the rest of this post is going to be mostly superfluous! If you want to play with an existing implementation, check out <a href="http://www.photospiralysis.com/">Photospiralysis</a>, which works in the browser.</p>
+
+
+
+
+
+
+
+
+
+
+<figure  style="float:right"><a href="droste-rect.jpg">
+    <img src="/posts/droste/droste-rect_hu27edf68fafd04f8423e2d9806d16fa92_1305335_200x0_resize_q75_box.jpg" width="200"/> </a>
+</figure>
+<p>I wanted to understand how Escher&rsquo;s Print Gallery effect actually worked, and implement it myself. Luckily, the incomparable Jos Leys has written a pretty straightforward <a href="http://www.josleys.com/article_show.php?id=82">explanation</a>, with pictures &amp; equations. Most of the following is going to be lifted directly from his article, except we&rsquo;re going to implement it as we read along. I recommend you read his article first, or at least give it a skim.</p>
+<p>The implementation will be as a GLSL fragment shader (aka pixel shader). These are fast, and if you stick to GLSL2.0, it will work happily in the browser and many other places. If you&rsquo;ve never touched fragment shaders, it would help to at least glance over <a href="http://patriciogonzalezvivo.com/2015/thebookofshaders/">The Book of Shaders</a> first. I am borrowing the author&rsquo;s code framework for displaying live examples.</p>
+<p>Jos Leys explains how the transformation goes forward from a square picture to a Droste picture. To work as a fragment shader, we&rsquo;re going to <strong>invert the transformation</strong>. For each point in the Droste picture, we work out which point on the original picture maps to it, and color our pixel accordingly. Working in this mode gives a feel of &ldquo;warping space&rdquo; rather than warping the image directly.</p>
+<hr>
+<p>We&rsquo;ll begin the same: with an annulus, the area between two circles. I am eliding how the annulus is actually drawn, mostly because I&rsquo;m not an expert shader writer and my code isn&rsquo;t great. Read The Book of Shaders linked above if you want to learn more about drawing shapes in GLSL.</p>
+<p>Don&rsquo;t forget that these examples are editable: adjust parameters and comment code out to see how it changes the result.</p>
+<!-- <div class="codeAndCanvas" data="float r1 = 0.3;
+float r2 = 0.7;
+vec3 color(vec2 z) {
+    return circles(z,r1,r2);
+}"><noscript><pre>float r1 = 0.3;
+float r2 = 0.7;
+vec3 color(vec2 z) {
+    return circles(z,r1,r2);
+}</pre></noscript></div> -->
+<div class="codeAndCanvas">float r1 = 0.3;
+float r2 = 0.7;
+vec3 color(vec2 z) {
+    return circles(z,r1,r2);
+}</div>
+<p>We are going to think of the annulus as actually sitting in the <a href="https://en.wikipedia.org/wiki/Complex_plane">complex plane</a>. We can perform complex arithmetic on our pixels! If you&rsquo;re unfamiliar with complex numbers, it suffices for our purposes to know that complex numbers have two &ldquo;coordinates&rdquo; (real and imaginary) and points in the complex plane can be represented as a single number: $(x,y)$ in the ordinary plane can be thought of as $x+yi$, a complex number. In GLSL, complex numbers are stored identically to a point in the plane: a <code>vec2</code>.</p>
+<p>You can perform arithmetic on complex numbers in similar ways to ordinary numbers. Addition, multiplication, and exponentiation all have equivalents in the complex plane. Most important for us is the <a href="https://en.wikipedia.org/wiki/Exponentiation#Imaginary_exponents_with_base_e">complex exponent</a> and its inverse, the complex logarithm.</p>
+<p>$z \rightarrow \log(z)$ has the property that it transforms complex numbers within $r$ units of the origin into a strip $2 \pi$ high and $\log(r)$ wide.</p>
+<p>$z \rightarrow \log(\frac{z}{r1})$ takes the annulus to a similar strip: points inside the annulus are transformed into points within a strip $2 \pi$ high and $\log(\frac{r2}{r1})$ wide.</p>
+<p>The inverse transformation is $z \rightarrow e^{z} \cdot r1$. Transforming our coordinate system this way <em>before</em> we draw the circle will have the same effect as drawing the circle and then transforming it forward by the $\log$ transformation.</p>
+<div class="codeAndCanvas" data="float r1 = 0.2;
+float r2 = 0.7;
+vec3 color(vec2 z) {
+	z = z*4.0; // just so we can see more
+	z = cExp(z)*r1;
+    return circles(z,r1,r2);
+}"><noscript><pre>float r1 = 0.2;
+float r2 = 0.7;
+vec3 color(vec2 z) {
+	z = z*4.0; // just so we can see more
+	z = cMul(cExp(z),vec2(r1,0.0));
+    return circles(z,r1,r2);
+}</pre></noscript></div>
+<p>And we obtain the strip we were looking for. But wait, it&rsquo;s infinitely tall! What&rsquo;s going on? The complex $\log$ is a multi-valued function: it maps the annulus to an infinite number of strips, all stacked up. It&rsquo;s defined as the inverse of the exponential function, and the exponential function actually takes points inside the infinitely tall ribbon to the annulus over and over again.</p>
+<p>So, now we&rsquo;re in what I call $\exp$-space. The rules are a bit different here. Just looking at the strip we have, left and right correspond to &ldquo;in-out&rdquo; in ordinary space; up and down correspond to rotating around the origin. This is the property that will generate the telescoping copies we want! We tile the ribbon horizontally in $\exp$-space using the modulo function:</p>
+<div class="codeAndCanvas" data="float r1 = 0.2;
+float r2 = 0.7;
+vec3 color(vec2 z) {
+	z = z*4.0; 
+ 	// 2. Tile the strips
+	z.x = mod(z.x,log(r2/r1)); 
+ 	// 1. Take the annulus to a strip
+	z = cExp(z)*r1;
+    return circles(z,r1,r2);
+}"><noscript><pre>float r1 = 0.2;
+float r2 = 0.7;
+vec3 color(vec2 z) {
+	z = z*4.0; 
+ 	// 2. Tile the strips
+	z.x = mod(z.x,log(r2/r1)); 
+ 	// 1. Take the annulus to a strip
+	z = cExp(z)*r1;
+    return circles(z,r1,r2);
+}</pre></noscript></div>
+<p>This looks like the wrong order, but since we&rsquo;re actually building an inverse function, later transformations need to be applied above earlier ones. Let&rsquo;s use $\log$ to leave $\exp$-space and see what our infinite tiling achieved. Even though above I said that the complex logarithm was a multi-valued function, we can define a version that acts like an ordinary function and returns a single value (the <a href="https://en.wikipedia.org/wiki/Principal_value">principal value</a>).</p>
+<div class="codeAndCanvas" data="float r1 = 0.2;
+float r2 = 0.7;
+vec3 color(vec2 z) {
+	z = z*1.0; // Play with this to zoom
+	// 3. Take the tiled strips back to ordinary space.
+	z = cLog(z); 
+ 	// 2. Tile the strips
+	z.x = mod(z.x,log(r2/r1));
+ 	// 1. Take the annulus to a strip
+	z = cExp(z)*r1;
+	return circles(z,r1,r2);
+}"><noscript><pre>float r1 = 0.2;
+float r2 = 0.7;
+vec3 color(vec2 z) {
+	z = z*1.0; // Play with this to zoom
+	// 3. Take the tiled strips back to ordinary space.
+	z = cLog(z); 
+ 	// 2. Tile the strips
+	z.x = mod(z.x,log(r2/r1));
+ 	// 1. Take the annulus to a strip
+	z = cExp(z)*r1;
+	return circles(z,r1,r2);
+}</noscript></pre></div>
+<p>Wow! We&rsquo;re well on our way. Each strip is transformed into another annulus, one nested inside the other. We can zoom in or out as much as we want, and there will always be another nesting annulus. We are sure of this because of the infinite tiling in $\exp$-space.</p>
+<p>By rotating and scaling the strips in $\exp$-space, we can create the spiral effect we are looking for. The transformation code here is just an inversion of the Jos Ley&rsquo;s transformation in his step (2): $z \rightarrow \frac{z}{e^{\theta i} \cdot cos(\theta)}$.</p>
+<div class="codeAndCanvas" data="float r1 = 0.2;
+float r2 = 0.7;
+vec3 color(vec2 z) {
+	z = z*4.0; 
+	// 3. Scale and rotate the strips
+	float scale = log(r2/r1);
+	float angle = atan(scale/(2.0*PI));
+	z = cDiv(z, cExp(vec2(0,angle))*cos(angle)); 
+ 	// 2. Tile the strips
+	z.x = mod(z.x,scale);
+	// 1. Take the annulus to a strip
+	z = cExp(z)*r1;
+	return circles(z,r1,r2);
+}"></div>
+<p>$a+bi$ and $a+(b+2\pi)i$ are transformed to the same point under the complex logarithm. After this rotation and scale, the top-right corner of each strip is exactly $2\pi$ above the bottom-left. After the logarithmic transformation, the upper right corner of each strip will coincide with the bottom-left corner of the previous. The inner circle and outer circle will connect! The result is a smooth spiral.</p>
+<p>Try commenting out the tiling in the following example. You&rsquo;ll see how the rotation in $\exp$ space has &ldquo;torn&rdquo; the annulus along the positive real axis. The tear is (I believe) a visual <a href="https://en.wikipedia.org/wiki/Branch_point#Complex_logarithm">branch cut</a>. The tiling repairs the tear by bringing in an infinite number of sheets that extend across all of the branches of the complex logarithm. I&rsquo;ve been attempting to teach myself <em>just enough</em> complex analysis to understand this part, so my explanation may not in fact make any sense. At least, with some playing around, you can see how it works geometrically.</p>
+<div class="codeAndCanvas" data="float r1 = 0.2;
+float r2 = 0.7;
+vec3 color(vec2 z) {
+	z = z*10.0; 
+	// 4. Take the tiled strips back to ordinary space.
+	z = cLog(z);
+	// 3. Scale and rotate the strips
+	float scale = log(r2/r1);
+	float angle = atan(scale/(2.0*PI));
+	z = cDiv(z, cExp(vec2(0,angle))*cos(angle)); 
+	// 2. Tile the strips
+	z.x = mod(z.x,scale);
+ 	// 1. Take the annulus to a strip
+	z = cExp(z)*r1;
+	return circles(z,r1,r2);
+}"></div>
+<p>Now we have a Droste effect put together, we can abstract it out to a function. Rather than drawing an annulus, we&rsquo;re going to draw a simple pattern to show what the effect does to more arbitrary shapes. Notice that with a small r1 it begins to resemble the Print Gallery, except the twist is going in the other direction.</p>
+<p>Only now does the most important property of this transformation become apparent: it is <a href="https://en.wikipedia.org/wiki/Conformal_map">conformal</a>, which means it preserves angles locally.	 Where two lines met at right angles before the transformation, they still do after being Drostified. This means that pictures transformed this way are very likely to remain recognizable.</p>
+<div class="codeAndCanvas" data="float r1 = 0.1;
+float r2 = 2.0;
+vec2 droste(vec2 z) {
+	// 4. Take the tiled strips back to ordinary space.
+	z = cLog(z);
+	// 3. Scale and rotate the strips
+	float scale = log(r2/r1);
+	// Negate the angle to twist the other way
+	float angle = atan(scale/(2.0*PI));
+	z = cDiv(z, cExp(vec2(0,angle))*cos(angle)); 
+	// 2. Tile the strips
+	z.x = mod(z.x,scale);
+ 	// 1. Take the annulus to a strip
+	z = cExp(z)*r1;
+	return z;
+}
+vec3 color(vec2 z){
+	z = droste(z);
+	// Draw anything you want below!
+    z = sin(z*20.0)*10.;
+    return vec3(z.x*z.y);
+}
+"></div>
+<p>In the next post(s), I&rsquo;ll explore how to handle <a href="http://roy.red/infinite-regression-.html#infinite-regression">Drostifying a square</a>. I&rsquo;ll also show how to generalize the effect by adjusting how much it twists, how many arms the spiral has, and more.</p>
+<p>As a reward for making it all the way to the end, here&rsquo;s an example of what you can do with the Droste effect! On the left is the original animation, and on the right the Droste transformation has been applied.</p>
+<center>
+<canvas class="glslCanvas" style:"margin: auto;" data-fragment-url="/shaders/gears.frag" width="500" height="250"></canvas>
+</center>
+</div>
+
+<div style="text-align:right;">
+  Next: <a href="/posts/slitscan/">Recreating the Doctor Who Time Tunnel in GLSL </a> &gt;</div>
+
+
+  <div>&lt; Previous: <a href="/posts/droste2/"> </a></div>
+
+
+<div class="related">
+
+
+<h3>See Also</h3>
+	
+  <div class="related-posts" style="float: left;max-width: 33%; padding-left: 5px; padding-right: 5px;">
+    <a href="/posts/infinite-regression/">
+      
+       
+        
+        <img width="200" src="/images/covers/infinite-regression.png"/>
+        
+       
+      
+    Infinite Regression: Many Pictures From One Function
+    </a>
+</div>
+
+	
+  <div class="related-posts" style="float: left;max-width: 33%; padding-left: 5px; padding-right: 5px;">
+    <a href="/posts/fractal-droste-images/">
+      
+       
+        
+        <img width="200" src="/images/covers/fractal-droste.png"/>
+        
+       
+      
+    Drawing fractal Droste images
+    </a>
+</div>
+
+	
+  <div class="related-posts" style="float: left;max-width: 33%; padding-left: 5px; padding-right: 5px;">
+    <a href="/posts/building-eschers-square-limit/">
+      
+       
+        
+        <img width="200" src="/images/covers/building-eschers-square-limit.png"/>
+        
+       
+      
+    Building Escher&#39;s Square Limit in Pixels
+    </a>
+</div>
+
+	
+
+</div>
+
+    </main>
+
+    
+      
+    
+  </body>
+</html>

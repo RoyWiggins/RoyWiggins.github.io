@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>droste on Roy&#39;s blog</title>
+    <link>/tags/droste/</link>
+    <description>Recent content in droste on Roy&#39;s blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 20 Jul 2016 20:15:16 +0000</lastBuildDate><atom:link href="/tags/droste/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Infinite Regression: Many Pictures From One Function</title>
+      <link>/posts/infinite-regression/</link>
+      <pubDate>Wed, 20 Jul 2016 20:15:16 +0000</pubDate>
+      
+      <guid>/posts/infinite-regression/</guid>
+      <description>Imitating a variety of Escherian limit tilings, as well as a squared-up Droste, by manipulating a simple function.</description>
+    </item>
+    
+    <item>
+      <title>Drawing fractal Droste images</title>
+      <link>/posts/fractal-droste-images/</link>
+      <pubDate>Tue, 17 May 2016 21:31:41 +0000</pubDate>
+      
+      <guid>/posts/fractal-droste-images/</guid>
+      <description>When I was researching Droste images for a previous post, I occasionally came across versions which depicted multiple spirals, rather than the ordinary single spiral. This led me down a rabbit hole to understand what is actually going on in these images, and to see what I could make with the effect.</description>
+    </item>
+    
+    <item>
+      <title>Implementing the Droste effect in WebGL</title>
+      <link>/posts/droste/</link>
+      <pubDate>Mon, 25 Apr 2016 22:33:23 +0000</pubDate>
+      
+      <guid>/posts/droste/</guid>
+      <description>The Droste effect is a name given to pictures that contain themselves, like an infinite series of nesting dolls. The conventional Droste effect is interesting, but it was taken to new heights by M.C. Escher&amp;rsquo;s &amp;ldquo;Print Gallery.&amp;rdquo; I wanted to understand how Escher&amp;rsquo;s Print Gallery effect actually worked, and implement it myself.</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-us" lang="en-us">
+<head>
+  <link href="https://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="generator" content="Hugo 0.70.0" />
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Infinite Regression: Many Pictures From One Function &middot; Roy.red</title>
+  <meta name="description" content="" />
+
+  
+  <link type="text/css" rel="stylesheet" href="http://roy.red/css/print.css" media="print">
+  <link type="text/css" rel="stylesheet" href="http://roy.red/css/poole.css">
+  <link type="text/css" rel="stylesheet" href="http://roy.red/css/syntax.css">
+  <link type="text/css" rel="stylesheet" href="http://roy.red/css/hyde.css">
+  <link type="text/css" rel="stylesheet" href="http://roy.red/css/glslEditor.css">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Abril+Fatface|PT+Sans:400,400i,700">
+
+
+  
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+  <link rel="shortcut icon" href="/favicon.png">
+
+  
+  <script type="application/javascript" src="/scripts/glslEditor.js"></script>
+  <script type="text/javascript" src="/scripts/GlslCanvas.js"></script>
+  
+  <script type="text/javascript" src="/scripts/main.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+
+    
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+
+    
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"
+        onload='renderMathInElement(document.body, {delimiters:[
+  {left: "$", right: "$", display: false},
+  {left: "@@", right: "@@", display: true},
+]});'></script></script>
+  
+</head>
+
+  <body class="theme-base-08 ">
+  <aside class="sidebar">
+  <div class="container">
+    <div class="sidebar-about">
+      <a href="http://roy.red/"><h1>Roy.red</h1></a>
+      <p class="lead">
+       Roy&#39;s blog 
+      </p>
+    </div>
+
+    <nav>
+      <ul class="sidebar-nav">
+        <li><a href="http://roy.red/">Home</a> </li>
+        <li><a href="https://github.com/RoyWiggins/"> Github </a></li>
+
+        <li><a href="/pages/resources/"> Resources </a></li><li><a href="/pages/resume/">  </a></li>        
+          
+      </ul>
+    </nav>
+
+    <p>&copy; 2020. All rights reserved. </p>
+  </div>
+</aside>
+
+    <main class="content container">
+    <div class="post">
+  <h1>Infinite Regression: Many Pictures From One Function</h1>
+  <time datetime=2016-07-20T20:15:16Z class="post-date">Wed, Jul 20, 2016</time>
+  <p><a href="/images/regular-division-of-the-plane-vi.jpg"><img style="float: right;" width="200" src="/images/regular-division-of-the-plane-vi.jpg"></a></p>
+<p>I was interested in trying to imitate Escher&rsquo;s image, &ldquo;Regular Division of the Plane IV&rdquo;, which depicts an infinite regression of tiles towards the edge. In doing so, I realized I&rsquo;d re-written a function I&rsquo;d seen elsewhere- in <a href="http://www.gamedev.net/topic/590070-glsl-droste">generating Droste images</a>- but hadn&rsquo;t looked at closely to understand what it could be used for. It&rsquo;s actually quite powerful and can be used to explore several of Escher&rsquo;s prints! So in this post I am going to play with this function and show how you can manipulate it to generate interesting scaling tilings, as well as a square Droste image (<a href="/droste-.html">see previous</a>). As usual there&rsquo;s an (over?)abundance of live code you can fiddle with. The code is GLSL. If GLSL is new to you, take a peek at the <a href="https://thebookofshaders.com/">Book of Shaders</a>; the editor will look familiar because I&rsquo;ve borrowed it.</p>
+<p>The equation is extremely simple:</p>
+<p>@@f(x) = 2^{\lfloor \log_2{x}\rfloor}@@</p>
+<p>It turns out it has the exact property we need to draw this sort of image. It&rsquo;s plotted below; <a href="https://www.desmos.com/calculator/4umgsbyrnk">see also in Desmos</a>. It builds a staircase that grows a lot like $y = x$, except that it has discrete jumps at every integer power of two. It also preserves some of the <em>dilational symmetry</em> of $y=x$: you can scale the whole thing by a power of two and you get the same plot. Ignoring the coloring, an extension of Escher&rsquo;s print across the whole half-plane would have the same exact symmetry.</p>
+<div style='clear:right' class="codeAndCanvas" data="float plot(vec2 st, float y){
+  return  smoothstep( y-0.02, y, st.y) - 
+          smoothstep( y, y+0.02, st.y);
+}
+float function(float x){
+    return exp2(floor(log2(x)));
+}
+vec3 color(vec2 z) {
+    z = (z+1.)*vec2(2.,1.02);
+    return vec3(.9-plot(z,function(z.x)));
+}"></div>
+<p>Between $0.5$ and $1.0$, $f(x) = 0.5$, and so forth, for adjacent powers of two:</p>
+<p>@@f(x) = 2^{n} { 2^n \leq x &lt; 2^{n+1}}@@</p>
+<p>This is exactly what we need. If you go back and look at the Escher print, there&rsquo;s a series of rows of tiles; each row is exactly half as tall as the one above, and the tiles within it are half as big.</p>
+<p>To start with, we need lots of copies of our image. Here a circle radius $0.5$ is used to tile the plane.</p>
+<div  style='clear:right' class="codeAndCanvas" data="float circle(vec2 z){
+    return 1.-length(2.*z-1.);
+}
+vec3 color(vec2 z) { 
+    z += 1.;
+    // fract == modulo 1.0
+    return vec3(circle(fract(z)));
+}"></div>
+<div style='clear:right'></div>
+<p>We then use $f(z.x)$ as a scaling factor, and out pops the Escher-type tiling that I was interested in at the beginning! Notice how in this picture, each &ldquo;column&rdquo; of circles lines up with a &ldquo;step&rdquo; of the plot of $f$ above.</p>
+<div class="codeAndCanvas" data="float f(float x){
+    return exp2(floor(log2(x)));
+}
+float circle(vec2 z){
+    return 1.-length(2.*z-1.);
+}
+vec3 color(vec2 z) { 
+    z += 1.;
+    float scale = f(z.x);
+    z /= scale;
+    return vec3(circle(fract(z)));
+}"></div>
+<p>But once we&rsquo;ve got this function, we can use it to draw more things! For instance, something reminiscent of Escher&rsquo;s <a href="http://www.wikiart.org/en/m-c-escher/smaller-smaller">Smaller and Smaller</a>. Instead of dividing by <code>scale</code>, we multiply by the reciprocal (multiplication is faster). The input to $f$ is calculated as the larger of $\left|x\right|$ and $\left|y\right|$ which produces a characteristic square pattern. The mathematics of <em>that</em> is either fiddly or obvious, depending on whether you&rsquo;ve seen it before, so I&rsquo;m going to skip over the derivation.</p>
+<div style='clear:right' class="codeAndCanvas" data="//'Smaller and Smaller'
+float f(float x){
+    return exp2(-floor(log2(x)));
+}
+float circle(vec2 z){
+    return 1.-length(2.*z-1.);
+}
+vec3 color(vec2 z) { 
+    vec2 a_z = abs(z);
+    float scale = f(max(a_z.x,a_z.y));
+    return vec3(circle(fract(z*scale)));
+}"></div>
+<p>Looking at this, I saw the obvious similarity to Droste images; it is a Droste image, except that we&rsquo;ve got extra copies of the original. &ldquo;Extra copies&rdquo; is a good problem to have, because we&rsquo;re just a constant or two away from a classic square Droste picture.</p>
+<div style='clear:right' class="codeAndCanvas" data-textures="/images/labyrinth.jpg" data="float f(float x){
+    return exp2(-floor(log2(x))-2.); // here's the change
+}
+vec3 color(vec2 z) { 
+    vec2 a_z = abs(z);
+    float scale = f(max(a_z.x,a_z.y));
+    return texture2D(u_tex0,z*scale+0.5).xyz;
+}"></div>
+<p>And now we can apply Escher&rsquo;s twist that <a href="/droste-.html">I implemented previously</a>. This time though, we don&rsquo;t need to use any modulo function, since we already have our infinitely nesting copies. This makes the transformation nearly a one-liner.</p>
+<div style='clear:right' class="codeAndCanvas" data-textures="/images/labyrinth.jpg" data="float f(float x){
+    return exp2(-floor(log2(x)));
+}
+vec3 color(vec2 z) { 
+    float angle = atan(log(2.)/(2.0*PI));
+    z = cExp(cDiv(cLog(z), cExp(vec2(0,angle))*cos(angle))); 
+    vec2 a_z = abs(z);
+    z *= f(max(a_z.x,a_z.y)*2.);
+    return texture2D(u_tex0,z*.5+0.5).xyz;
+}"></div>
+<p>The obvious generalization to $f$ is to allow an arbitrary exponent, and it turns out it also generalizes our Droste too, adjusting how deep each copy is created.</p>
+<p>@@f(x,n) = n^{\lfloor \log_n{x}\rfloor}@@</p>
+<div style='clear:right' class="codeAndCanvas" data-textures="/images/labyrinth.jpg" data="float f(float x,float n){
+    return pow(n,-floor(log(x)/log(n)));
+}
+vec3 color(vec2 z) {
+    float ratio = 5.264;
+    float angle = atan(log(ratio)/(2.0*PI));
+    z = cExp(cDiv(cLog(z), cExp(vec2(0,angle))*cos(angle)));
+    vec2 a_z = abs(z);
+    z *= f(max(a_z.x,a_z.y)*2.,ratio);
+    return texture2D(u_tex0,z/ratio+.5).xyz;
+}"></div>
+<p>And with some more constants and an adjustment, there&rsquo;s a simple version of Escher&rsquo;s <a href="http://www.wikiart.org/en/m-c-escher/square-limit?utm_source=returned">Square Limit</a> hidden inside here as well!</p>
+<div style='clear:right' class="codeAndCanvas" data="float f(float x){
+    return exp2(-floor(log2(x)));
+}
+float circle(vec2 z){
+    return 1.-length(2.*z-1.);
+}
+vec3 color(vec2 z) { 
+    // Arrived at by motivated guesswork
+    z = (z+1.)*.75;
+    vec2 a_z = .75-abs(z-.75);
+    return vec3(circle(fract(z*f(min(a_z.x,a_z.y)))));
+}"></div>
+<p>That&rsquo;s all for now! If you want to have some more fun with Droste images, check out my previous post on <a href="/fractal-droste-images-.html">fractally-distorted drostes</a>. Or perhaps take a leap into the <a href="/slitscan-.html">Time Tunnel</a>!</p>
+<p>See also:</p>
+<ul>
+<li>David Bailey&rsquo;s <a href="http://www.tess-elation.co.uk/self-similar-tessellations">World of Tessellations</a></li>
+<li><a href="https://shashi.github.io/ijulia-notebooks/funcgeo/">Functional Geometry in Julia</a></li>
+</ul>
+
+</div>
+
+
+    </main>
+
+    
+      
+    
+  </body>
+</html>

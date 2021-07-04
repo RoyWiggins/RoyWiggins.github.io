@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-us" lang="en-us">
+<head>
+  <link href="https://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="generator" content="Hugo 0.70.0" />
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Building Escher&#39;s Square Limit in Pixels &middot; Roy.red</title>
+  <meta name="description" content="" />
+
+  
+  <link type="text/css" rel="stylesheet" href="http://roy.red/css/print.css" media="print">
+  <link type="text/css" rel="stylesheet" href="http://roy.red/css/poole.css">
+  <link type="text/css" rel="stylesheet" href="http://roy.red/css/syntax.css">
+  <link type="text/css" rel="stylesheet" href="http://roy.red/css/hyde.css">
+  <link type="text/css" rel="stylesheet" href="http://roy.red/css/glslEditor.css">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Abril+Fatface|PT+Sans:400,400i,700">
+
+
+  
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+  <link rel="shortcut icon" href="/favicon.png">
+
+  
+  <script type="application/javascript" src="/scripts/glslEditor.js"></script>
+  <script type="text/javascript" src="/scripts/GlslCanvas.js"></script>
+  
+  <script type="text/javascript" src="/scripts/main.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+
+    
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+
+    
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"
+        onload='renderMathInElement(document.body, {delimiters:[
+  {left: "$", right: "$", display: false},
+  {left: "@@", right: "@@", display: true},
+]});'></script></script>
+  
+</head>
+
+  <body class="theme-base-08 ">
+  <aside class="sidebar">
+  <div class="container">
+    <div class="sidebar-about">
+      <a href="http://roy.red/"><h1>Roy.red</h1></a>
+      <p class="lead">
+       Roy&#39;s blog 
+      </p>
+    </div>
+
+    <nav>
+      <ul class="sidebar-nav">
+        <li><a href="http://roy.red/">Home</a> </li>
+        <li><a href="https://github.com/RoyWiggins/"> Github </a></li>
+
+        <li><a href="/pages/resources/"> Resources </a></li><li><a href="/pages/resume/">  </a></li>        
+          
+      </ul>
+    </nav>
+
+    <p>&copy; 2020. All rights reserved. </p>
+  </div>
+</aside>
+
+    <main class="content container">
+    <div class="post">
+  <h1>Building Escher&#39;s Square Limit in Pixels</h1>
+  <time datetime=2016-12-31T19:16:05Z class="post-date">Sat, Dec 31, 2016</time>
+  <p><a href = "https://www.wikiart.org/en/m-c-escher/square-limit?utm_source=returned&utm_medium=referral&utm_campaign=referral"><img style="float: right;" width="300" src="/images/square-limit.jpg"/></a></p>
+<p>I&rsquo;ve been fascinated by M.C. Escher&rsquo;s &ldquo;Square Limit&rdquo; print for a while. In the hopes of understanding it better I decided to try to generate my own square limit images. Drawing a Square Limit was done as early as 1981, more recently in <a href="https://shashi.github.io/ijulia-notebooks/funcgeo/">Julia</a>, using a functional approach. I didn&rsquo;t find these methods satisfying, partly because they relied on directly drawing each motif iteratively, even if they are using the symmetries of the piece.</p>
+<p>I built a way to render square limits with a GLSL fragment shader and in this post I&rsquo;m going to walk through most of it and explain how it works. For a shader primer, check out the <a href="http://thebookofshaders.com/">Book of Shaders</a>. The important thing to know is that to write a fragment shader, you build a function that takes a location (in our case, of a pixel) and returns a color. All the code here is &ldquo;live&rdquo;, though changes you make in each box will not cascade down to the subsequent ones- it&rsquo;s not a proper live coding environment. A full version of the code is linked at the end.</p>
+<div style='clear:right'></div>
+<img style="float: right;" width="200" src="/images/bird-shape-2.png"/>
+<p>To start, we&rsquo;re going to to the fiddly bit, drawing the motif itself. I&rsquo;m going to use a simplified motif of a bird borrowed from <a href="http://www.tess-elation.co.uk/self-similar-tessellations">David Bailey</a>. Looking at the simplified motif, it&rsquo;s more clear what symmetries exist. I&rsquo;ve circled the four regions of the border that are related by by scaling, flipping, and rotation. The most flexible way to draw the motif is to exploit these symmetries.</p>
+<p>If you look closely at the original print, you&rsquo;ll notice that while it looks like one motif scaled and rotated many times, there are actually regular distortions in the shapes of the fish. For instance, where three fish come together, the fins are adjusted so they have threefold rotational symmetry, rather than coming together in a T shape. My square limit doesn&rsquo;t accurately capture these, but then neither do any of the other computer-generated square limits that I&rsquo;ve seen. The way mine is drawn, it would not be too hard to manually adjust the motifs in these places but I&rsquo;m going to leave it for the future.</p>
+<div style='clear:right'></div>
+<p>First, we draw one of the marked regions. It may not be immediately obvious why this draws a bump. It&rsquo;s just $y = -|x+.5|+.5 $ rewritten as an <a href="https://www.desmos.com/calculator/t8yifdzokv">implicit formula</a> so we can assign each pixel a value directly.</p>
+<div class="codeAndCanvas" literate data="float bird_shape(vec2 z){
+    return 10.*(z.y+min(0.,abs(z.x+.5)-.5)+2.);
+}
+vec3 color(vec2 z) {
+    return vec3(bird_shape(z*2.));
+}"></div>
+<div style='clear:right'></div>
+<p>Next we need to rotate and scale this shape three more times to form the bird shape. The shapes are composed together using <code>min</code>, which may seem strange at first glance. The edge of our shape is defined by $f(z) = 0$. If $h = min(f,g)$, then $h(z) \leq 0$ when either $f(z)$ or $g(z)$ is. And on the other hand, $h(z) &gt; 0$ if and only if $f(z) \gt 0$ and $g(z) \gt 0$. So the shape we see after composing them with <code>min</code> is the intersection- a logical AND- of the two original shapes. We&rsquo;re carving the plane into two regions, one inside the bird and one outside.</p>
+<div class="codeAndCanvas" literate data="float bird(vec2 z){
+    float color = bird_shape(z)*smoothstep(-0.001,0.001,-z.x);
+    // rot 180
+    color -= bird_shape(z*mat2(-1,0,0,-1)+vec2(0,-4))*smoothstep(0.,0.001,z.x);
+    z *= mat2(1.,1.,-1.,1.);// rot 45, scale
+    z.y += 4.;
+    z = vec2(z.x,-z.y);
+    color = min(color,bird_shape(z*.5));
+    z *= mat2(0.,1.,-1.,0.);
+    z += 4.;
+    color = min(color,-bird_shape(-z*.5));
+    return smoothstep(-0.001,.001,color);;
+}
+vec3 color(vec2 z) {
+    return vec3(bird(z*2.-vec2(0,1)));
+}"></div>
+<p>Now we can build the three-bird square that is the heart of the image. This needs to be drawn various times with various different colors, so this function takes parameters to adjust which colors are drawn.</p>
+<div class="codeAndCanvas" literate data="const vec3 light = vec3(0.995,0.964,0.573);
+const vec3 mid = vec3(0.995,0.663,0.261);
+const vec3 dark = vec3(0.995,0.390,0.314);
+vec3 colors(int n,bool cycleDir){
+    n = n > 2? n-3: n; // modulo (int x) doesn't exist, so
+    if (!cycleDir) n = 2 - n;
+    return n == 2? mid: n == 1? dark: light;
+}
+vec3 three_birds(vec2 z, int t,bool s){
+    vec3 color;
+    z = z.yx;
+    color = bird(z)*colors(t,s);
+    color = mix(color,colors(1+t,s),bird(z*mat2(0,-1,1,0)));
+    z = (z+vec2(-2.,-2.))*mat2(-.5,.5,.5,.5);
+    color = mix(color,colors(2+t,s),bird(z));
+    return color;
+}
+vec3 color(vec2 z) {
+    return vec3(three_birds(z*3.,1,true));
+}"></div> 
+<img style="float: right;" width="200" src="/images/simple-square-limit.png"/>
+<p>Now, we&rsquo;re going to switch gears. We don&rsquo;t want to draw every single bird by hand, so we&rsquo;re going to zoom out to look at the whole design. In a <a href="/infinite-regression-.html#">previous post</a>, I found a transformation that will &ldquo;shatter&rdquo; a square tile into an infinite regression inside a large square; see the last example in that post to understand how it works better. You can also play with the transformation in the <a href="https://www.desmos.com/calculator/rju8punri0">Desmos online graphing calculator</a>.</p>
+<div style='clear:right'></div>
+<a href="/images/colored-square-limit.jpg"><img style="float: right;" width="200" src="/images/colored-square-limit.jpg"/></a>
+<p>Rather than draw the same tile at each scale, to draw a proper square limit, some of the constituent tiles are going to necessarily be different from each other. At the center, for example, four motifs come together; along the diagonals, four motifs come together as well, though the coloring is different.</p>
+<p>To orient ourselves, we&rsquo;re just going to start with the scaling-transform and mask off each of the regions. We calculate the scaling factor twice, once in the $x$ and once in the $y$ direction. The magenta squares lie where the scaling factors in both directions are equal. The square in the middle has a scaling factor of two, so we will color that red with a special case. The green and yellow regions are distinguisable by which of $x$ and $y$ are greater.</p>
+<div class="codeAndCanvas" literate data="vec2 scale_f(vec2 x){
+    return exp2(-floor(log2(x)));
+}
+vec3 color(vec2 z) {
+    z = (z+1.)*.75; 
+    vec2 scale = scale_f(.75-abs(z-.75));
+    if (scale.x == scale.y) {
+        if (scale.x == 2.) // Center square
+            return vec3(1,0,0);
+        return vec3(1,0,1); // 'Corner' squares
+    } else if (scale.x < scale.y){
+        // Top and bottom
+        return vec3(0,1,0);
+    } else { //scale.x > scale.y
+        // Left and right
+        return vec3(1,1,0); 
+    }
+}"></div>
+<p>Here&rsquo;s the center tile. The corners of the &ldquo;diamond&rdquo; will get cropped down into a square flush around the central four birds. Four birds around the edge appear to be superfluous, but with a different motif they won&rsquo;t be, so it&rsquo;s much easier just to leave them in.</p>
+<div class="codeAndCanvas" literate data="vec3 center_tile(vec2 z){
+    vec3 color = vec3(0);
+    z = z.yx;
+    z = z*4.-2.;
+    z *= mat2(.5,.5,-.5,.5);
+    for (int n=0;n<=1;n++){
+        // modulo(int) doesn't seem to exist, two loops
+        // seems to be the cleanest way to do this.
+        for (int m=0;m<=1;m++){
+            color += three_birds(z*2.+2.,m+1,m==1);
+            z *= mat2(0,1,-1,0);
+        }
+    }
+    return color;
+}
+vec3 color(vec2 z) {
+    return vec3(center_tile(z+.5));
+}"></div>
+<p>Next, the corner tiles. They&rsquo;re pretty fiddly, because they have two color schemes. I&rsquo;m not sure there&rsquo;s any way to talk through the code that will make it more clear, so I&rsquo;m going to show it as-is. It stamps two three-bird squares, and four individual birds to make up the other half.</p>
+<div class="codeAndCanvas" literate data="vec3 corner_tile(vec2 z,bool type){
+    z = z.yx;
+    z = z*4.-2.;
+    int t = int(type);
+    vec3 color = vec3(0);
+    z *= mat2(.5,.5,-.5,.5);
+    if ( t == 1 )
+        z *= mat2(0,1,-1,0);
+    //
+    color += three_birds(z*2.+2.,1+t,0+t ==1);
+    z *= mat2(0,1,-1,0);
+    color += three_birds(z*2.+2.,2-t,1-t ==1);
+    z *= mat2(0,1,-1,0) * mat2(1,1,-1,1);
+    color = mix(color,colors(0,true),bird(z));
+    z *= mat2(0,-1,1,0);
+    color = mix(color,colors(2-t,true),bird(z));
+    z *= mat2(0,-1,1,0);
+    color = mix(color,colors(1+t,true),
+                bird(z+vec2(0.,-4.)));
+    z *= mat2(0,-1,1,0);
+    color = mix(color,colors(2,false),
+                bird(z+vec2(0.,-4.)));
+    return vec3(color);
+}
+vec3 color(vec2 z) {
+    return vec3(corner_tile(z+.5,true));
+}"></div>
+<p>Now the corner tiles can slot into our big square. Notice that the corner tiles on the bottom half need to be rotated 180 degrees around, compared to the top half. The entire print actually has 180 degree symmetry, so we can exploit this to create a copy of the entire top half on the bottom by modifying the coordinate system <em>before</em> we draw anything.</p>
+<div class="codeAndCanvas" literate
+ data="vec3 color(vec2 z) {
+    // 180 degree rotational symmetry:
+    if (z.y < 0.) z=-z; 
+    // The lower half is a 180-degree rotated copy
+    z = (z+1.)*.75; 
+    vec2 a_z = .75-abs(z-.75);
+    vec2 scale = scale_f(a_z);
+    if (scale.x == scale.y) {
+        if (scale.x == 2.)// Center square
+              return center_tile(z*2.-1.);
+        else // 'Corner' squares
+            return corner_tile(mod(z*scale,1.),z.x>1.); 
+    } else if (scale.x < scale.y){
+        // Top and bottom
+        return vec3(0,1,0);
+    } else { //scale.x > scale.y
+        // Left and right
+        return vec3(1,1,0); 
+    }
+}"></div>
+<p>On the sides, instead of using a square tile, we use a rectangular one consisting of two three-bird tiles. As usual, we fill in the immediate neighbors around the edge.</p>
+<div class="codeAndCanvas" literate data="vec3 side_tiles(vec2 z,int colStart,bool cycleDir){
+    z = -z*4. + vec2(6,2);
+    vec3 col = three_birds(z,colStart,cycleDir);
+    vec3 tile2 = three_birds(z*mat2(0,1,-1,0)+vec2(0,4)
+,1+colStart,cycleDir);
+    col = max(vec3(0.),col - tile2)+tile2;
+    //
+    // fill in around the edge
+    // Left and right
+    col = mix(col, colors(2+colStart,cycleDir),
+                   bird(z*mat2(0,-1,-1,0)-vec2(0,4)));
+    col = mix(col, colors(  colStart,cycleDir),
+                   bird(z*mat2(0,1,1,0)-vec2(0,8)));
+    //
+    // Big top bird
+    col = mix(col,colors(1+colStart,cycleDir),
+                  bird((z-2.)*mat2(-.5,0,0,.5)+vec2(0.,-2.)));
+    // Small bottom birds.
+    z.x = mod(z.x-2.,4.)+2.;
+    col = mix(col,colors(colStart,cycleDir),
+                  bird((z-2.)*mat2(1,1,-1,1)+vec2(2.,6.)));
+    col = mix(col,colors(2+colStart,cycleDir),
+                  bird((z+vec2(-2,2))*mat2(1,-1,1,1)-2.));
+    return col;
+}
+vec3 color(vec2 z) {
+    return vec3(side_tiles(z*2.+1.,1,true));
+}"></div>
+<p>Now we can drop the side tiles into our big square, and out pops the square limit!</p>
+<div class="codeAndCanvas" literate data="vec3 color(vec2 z) {
+    if (z.y < 0.) z=-z; 
+    z = (z+1.)*.75; 
+    vec2 a_z = .75-abs(z-.75);
+    vec2 scale = scale_f(a_z);
+    if (scale.x == scale.y) {
+        if (scale.x == 2.)// Center square
+              return center_tile(z*2.-1.);
+        else // 'Corner' squares
+            return corner_tile(mod(z*scale,1.),z.x>1.); 
+    } else if (scale.x < scale.y){
+        // Top and bottom
+        return side_tiles(mod(z*scale.y,2.),0,false);
+    } else { //scale.x > scale.y
+        // Left and right
+        // Rotate around so the right-hand side is correct:
+        if (z.x > 1.) z = -z;
+        z = vec2(z.y,-z.x); // 90 degree rotation
+        return side_tiles(mod(z*scale.x,2.),1,true);
+    }
+    return vec3(0);
+}"></div>
+<p>Feel free to play with the complete source code [in the editor](<a href="http://roy.red/editor/#/shaders/square">http://roy.red/editor/#/shaders/square</a> limit-5.frag). One thing to try changing is the motif- there are probably some more interesting ones!</p>
+<div class="codeAndCanvas" literate  override="bird_shape" pre="vec3 sq_limit(vec2 z){
+    if (z.y < 0.) z=-z; z = (z+1.)*.75; 
+    vec2 a_z = .75-abs(z-.75), scale = scale_f(a_z);
+    if (scale.x == scale.y) {
+        if (scale.x == 2.) return center_tile(z*2.-1.);
+        else return corner_tile(mod(z*scale,1.),z.x>1.); 
+    } else if (scale.x < scale.y){
+        // Top and bottom
+        return side_tiles(mod(z*scale.y,2.),0,false);
+    } else { //scale.x > scale.y
+        if (z.x > 1.) z = -z;
+        z = vec2(z.y,-z.x); // 90 degree rotation
+        return side_tiles(mod(z*scale.x,2.),1,true);
+    }
+}" data="float bird_shape(vec2 z){
+    return 10.*(z.y+sin(u_time*3.)*min(0.,abs(z.x+.5)-.5)+2.);
+}
+vec3 color(vec2 z) {
+    return sq_limit(z);
+}"></div>
+<div style='clear:right'></div>
+<p>And a bonus: this method can easily be adjusted slightly to produce an analog of another Escher print, &ldquo;Smaller and Smaller&rdquo;. Check out the source code in the editor <a href="http://roy.red/editor/#/shaders/smaller-and-smaller-4.frag">here</a>.</p>
+<center><img style="" width="70%" src="/images/smaller.gif"/></center>
+
+</div>
+
+
+    </main>
+
+    
+      
+    
+  </body>
+</html>

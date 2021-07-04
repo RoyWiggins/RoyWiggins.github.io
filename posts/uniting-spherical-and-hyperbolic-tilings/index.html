@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-us" lang="en-us">
+<head>
+  <link href="https://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="generator" content="Hugo 0.78.1" />
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Uniting spherical and hyperbolic tilings &middot; Roy&#39;s blog</title>
+  <meta name="description" content="" />
+
+  
+  <link type="text/css" rel="stylesheet" href="css/print.css" media="print">
+  <link type="text/css" rel="stylesheet" href="css/poole.css">
+  <link type="text/css" rel="stylesheet" href="css/syntax.css">
+  <link type="text/css" rel="stylesheet" href="css/hyde.css">
+  <link type="text/css" rel="stylesheet" href="css/glslEditor.css">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Abril+Fatface|PT+Sans:400,400i,700">
+  <link href="//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic" rel="stylesheet" type="text/css">
+
+  
+  
+
+  
+  <script type="application/javascript" src="/scripts/glslEditor.js"></script>
+  <script type="text/javascript" src="/scripts/GlslCanvas.js"></script>
+  
+  <script type="text/javascript" src="/scripts/main.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+
+    
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+
+    
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"
+        onload='renderMathInElement(document.body, {delimiters:[
+  {left: "$", right: "$", display: false},
+  {left: "@@", right: "@@", display: true},
+]});'></script></script>
+  
+</head>
+
+  <body class="theme-base-08 ">
+  <aside class="sidebar">
+  <div class="container">
+    <div class="sidebar-about">
+      <a href=""><h1>Roy&#39;s blog</h1></a>
+      <p class="lead">
+         
+      </p>
+    </div>
+
+    <nav>
+      <ul class="sidebar-nav">
+        <li><a href="">Home</a> </li>
+        <li><a href="https://github.com/RoyWiggins/"> Github </a></li><li><a href="/editor"> Shader Editor </a></li><li><a href="https://twitter.com/RoyWiggins/"> Twitter </a></li>
+
+        <li><a href="/pages/resources/"> Resources </a></li><li><a href="/pages/resume/">  </a></li>        
+          
+      </ul>
+    </nav>
+
+    
+  </div>
+</aside>
+
+    <main class="content container">
+    <div class="post">
+  <h1>Uniting spherical and hyperbolic tilings</h1>
+  <time datetime=2018-01-06T13:27:09Z class="post-date">Sat, Jan 6, 2018</time>
+  <p>In <a href="/folding-tilings-.html#folding-tilings">my previous post</a>, I explored generating hyperbolic, euclidean and spherical tilings using circle inversions. While it produced interesting pictures and animations, I wasn&rsquo;t able to derive a formula to generate particular tilings. There&rsquo;s another way to generate tilings that admits a beautifully simple unification of the three geometries. We will need a bit more machinery, but the result is interesting and approaches the problem in a different way. This post is based nearly entirely on <a href="https://www.shadertoy.com/view/4sf3zX">Knighty&rsquo;s shader</a> with some help from notes the author left on fractalforums.</p>
+<p>The code below is in the form of fragment shaders. For a shader primer, check out the <a href="http://thebookofshaders.com/">Book of Shaders</a>. The important thing is that to write a fragment shader, you build a function that takes a location (in our case, of a pixel) and returns a color. All the code here is &ldquo;live&rdquo;, though changes you make in each box will not cascade down to the subsequent ones.</p>
+<div style ="padding: .5em; border: 1px solid black; float:right; text-align: center; font-size: 0.8em; color:gray">
+<img style="float:right;" width="230px" src="/images/triangles.svg"/></a><br/>Triangles in different geometries</div>
+<p>To begin, we need to define the triangle that we are going to tile. A triangle can be defined by the angles  made at each vertex. In hyperbolic and spherical geometry, three angles are sufficient to define the triangle uniquely (you can&rsquo;t scale triangles without the internal angles also changing). A triangle can tile its geometry if (and only if) all three angles divide $2\pi$. In other words, around each vertex, you can fit a whole number of triangle copies. The usual way to define a triangle is therefore to pick $p,q,r$ and set the internal angles to be $\frac{\pi}{p},\frac{\pi}{q}$ and $\frac{\pi}{r}$. To tell if $(p,q,r)$ describes a spherical, planar, or hyperbolic triangle, we compare the sum of the interior angles to $\pi$: if it&rsquo;s less, it&rsquo;s hyperbolic; if greater, it&rsquo;s spherical. Since they all divide $\pi$, you can simply compare $\frac{1}{p} + \frac{1}{q} + \frac{1}{r}$ to $1$.</p>
+<p>The next thing we need to define is our <em>model</em> of each geometry. Euclidean and spherical geometry both have natural models: the plane and the sphere. In the previous post, we mentioned the hyperboloid model on the way to working in the Poincaré model, but here we are going to use the hyperboloid model directly. The sphere and plane are both familiar, but we have to inspect the hyperboloid model more closely to understand what&rsquo;s actually going on.</p>
+<div style ="padding: .5em; border: 1px solid black; float:right; text-align: center; font-size: 0.8em; color:gray">
+<img style="float:right;" width="230px" src="/images/hyperboloid2.svg"/></a><br/>Hyperboloid</div>
+<p>The hyperboloid model lives on an infinitely large three-dimensional bowl shape. What you can&rsquo;t see in the diagram is that it doesn&rsquo;t live inside ordinary space at all. This space has a different metric, which means lengths and angles aren&rsquo;t measured quite the same. In ordinary 3D space, the dot product of two vectors $\vec{a} \cdot \vec{b}$, $\vec{a}=\left\langle a_0,a_1,a_2\right\rangle,\vec{b}=\left\langle b_0,b_1,b_2\right \rangle$ is $a_0b_0+a_1b_1+a_2b_2$.</p>
+<p>We can use the dot product to define the squared-magnitude (aka length squared) of a vector $\vec{a}$ :</p>
+<p>@@\vec{a} \cdot \vec{a} = a_0^2+a_1^2+a_1^2 = |\vec{a}|^2@@</p>
+<p>The hyperboloid model lives in a space where a different dot product applies:</p>
+<p>@@\vec{a} \cdot_{\tiny{H}} \vec{b} = a_0b_0+a_1b_1-a_2b_2@@</p>
+<p>If we use the dot product to define the magnitude-squared of $\vec{a}$, we get a different magnitude than in ordinary space. In other words, distances behave differently here.
+@@|\vec{a}|^2 = a_0^2+a_1^2-a_1^2@@</p>
+<div style ="padding: .5em; border: 1px solid black; float:right; text-align: center; font-size: 0.8em; color:gray">
+<img style="float:right;" width="130px" src="/images/hyperbola.png"/></a><br/>Hyperbola</div>
+<p>The equation for this hyperboloid is $x^2 + y^2 - z^2 = 1$. Alternatively, you can define it as vectors $\vec{a}$ such that $\vec{a} \cdot_{\tiny{H}} \vec{a} = 1$. In the ordinary 3-D Euclidean metric, $\vec{a} \cdot \vec{a} = 1$ is a unit sphere. So, this hyperboloid is a sort of &ldquo;hyperbolic sphere&rdquo;- it&rsquo;s this space&rsquo;s equivalent of a sphere, the set of all points a unit distance away from the origin. We can draw a 2D version of this easily. Notice that with <code>space = 0</code>, it &ldquo;degenerates&rdquo; into two flat planes.</p>
+<p>It&rsquo;s important that we are actually flipping the surface so that the two halves of the hyperboloid open vertically up and down, and the Euclidean plane(s) are also in line with the $xy$ plane. It&rsquo;s points on these surfaces that behave like we want.</p>
+<div class="codeAndCanvas" data="// This is code is 'live'; adjust 'space'
+float y = 0.;
+float space = -1.; // try 0.0 or 1.0
+float dot_(vec3 a, vec3 b) { 
+    // Perform either dot product
+    return a.x*b.x+a.y*b.y+space*a.z*b.z;
+}
+vec3 color(vec2 z) {
+    // Draw the xz-plane
+    vec3 z3 = 2.*vec3(z.x,y,z.y); 
+    z3 = z3.zyx; // flip
+    return vec3(dot_(z3,z3)<0.9 ||
+                dot_(z3,z3)>1.1);
+}"></div>
+<p>In the hyperboloid model of hyperbolic geometry, lines are the intersection of the hyperboloid with planes through the origin (&ldquo;cutting planes&rdquo;), which take the form of hyperbolas. These are akin to the great circles, which are lines in spherical geometry, and are <em>also</em> intersections of the sphere with cutting planes. We can also identify lines in Euclidean geometry as intersections of cutting planes with a plane at $z=1$.</p>
+<p>It&rsquo;s obvious that if you take a plane passing through the origin, it cuts the sphere in two identical pieces, and reflecting the sphere across the plane is an isometry: it doesn&rsquo;t change the sphere. This is also true for cutting planes and the hyperboloid&hellip; <em>if</em> you reflect it using the hyperbolic dot product, rather than the Euclidean.</p>
+<p>First, we identify the plane with the normal vector $\vec{p}$, which has a unit norm $\vec{p} \cdot \vec{p} = 1$. To reflect a vector $\vec{a}$ across a plane with unit normal $\vec{p}$, we can perform the following operation:</p>
+<p>@@\vec{a}' = \vec{a} - 2(\vec{a} \cdot \vec{p})\vec{p}@@</p>
+<p>It&rsquo;s easiest to see why this works in the Euclidean case. $\vec{a} \cdot \vec{p}$ is the distance from $\vec{a}$ (interpreted as a point) to the plane. $\vec{a} - (\vec{a} \cdot \vec{p})\vec{p}$ lies on the plane; subtracting again, and you&rsquo;re the same distance away on the other side of the plane. Importantly, this works exactly the same way with points on the vertical hyperboloid and the hyperbolic dot product. Reflecting the hyperboloid across a plane like this is an isometry, just like reflecting a sphere is.</p>
+<p>However, to make this work for euclidean tilings we are going to rewrite it in terms of the dot product only. To start, let&rsquo;s try it with the hyperbolic case. If we negate the $z$ coordinate of $\vec{p}$, we can build a transformation that reflects properly (negating $z$ is &ldquo;safe&rdquo; because between the two arms of the hyperboloid, the problem is symmetrical).</p>
+<p>@@ \begin{aligned} \vec{p} &= \langle p_0,p_1,p_2 \rangle \\
+\vec{q} &= \langle p_0,p_1,-p_2 \rangle \\
+\vec{a}^\prime &= \vec{a} - 2(\vec{a} \cdot_{\tiny{H}} \vec{p}) \vec{p} \\
+\vec{a}^\prime &= \vec{a} - 2( a_0p_0+a_1p_1-a_2p_2 ) \vec{p}  \\
+\vec{a}^\prime &= \vec{a} - 2( \vec{a} \cdot \vec{q} ) \vec{p} \\
+\vec{a}^\prime &= \vec{a} - 2( \vec{a} \cdot \vec{q} ) \vec{q} \langle1,1,-1\rangle
+\end{aligned} @@</p>
+<p>So for $k \in {1,-1}$ it&rsquo;s clear that $\vec{a} - 2( \vec{a} \cdot \vec{p} ) \vec{p} \langle1,1,k\rangle$ is the right transformation. But now if we set $k=0$, it produces a reflection across the intersection of the cutting plane with the plane at $z=1$ (it definitely maps the plane to itself, because $z$ is unchanged). Strictly speaking, in the plane it is not quite an isometry: distances end up being scaled as well.</p>
+<p>Here it is in action in two dimensions. Switch to the ordinary space by setting <code>space = 1</code>. See what it does to the red region in each space as you adjust <code>p</code>. Notice that the shape of the surface (circle, hyperboloid or plane) is preserved by the transformation.</p>
+<div class="codeAndCanvas" data="float space = -1.;
+vec2 p = vec2(-0.460,-0.130);
+// Calculate the length-squared of vector
+float len2(vec2 a) {
+    return a.x*a.x + space*a.y*a.y;
+}
+vec3 color(vec2 a) {
+    a *= 2.; vec3 c = vec3(1);
+    // Normalize so len(p)=1
+    p /= sqrt(len2(p));
+    // Reflect the world
+    a = a - 2.*dot(a,p)*p*vec2(1,space);
+    // Draw the cutting plane
+    c.rg = vec2(abs(dot(a,p))>.05);
+    // Draw the plane normal vector
+    c.rb -= float(abs(dot(a,vec2(-p.y,p.x)))<.03 
+            && dot(a,p)<0. && dot(a,a)<.2);
+    // Draw the surface
+    c -= vec3(abs(len2(a.yx)-1.)<0.1)
+    // Draw the red region
+        *vec3(1.-(1.-abs(a.x))*float(a.y>0.),1,1);
+    return c;
+}"></div>
+<p>So. Now we know how to reflect in our geometries. Now, we need to work out what planes to reflect across.</p>
+<p>If two cutting planes intersect with angle $\theta$, the angle the associated great circles make on the sphere is clearly also $\theta$, because the planes are always perpendicular to the sphere. This is also true for the angle between two planes and the angle between their associated hyperbolas on the hyperboloid: the cutting planes are actually perpendicular to the hyperboloid, if you measure using the hyperbolic dot product. You can define angles between two cutting planes by the dot product of their respective normal vectors:</p>
+<p>@@\cos{\theta} = |\vec{a}||\vec{b}| \vec{a} \cdot \vec{b}@@</p>
+<p>This also applies with the hyperbolic dot product, but angles (like distances) stop being exactly what they look like.</p>
+<p>So, the problem of finding triangles with a particular $(p,q,r)$ is the same as finding three vectors $\vec{a}, \vec{b}, \vec{c}$ that define cutting planes that make the correct angles with each other, measured in the correct metric. So:</p>
+<p>@@ \begin{aligned}
+\vec{a} \cdot \vec{b} & = -\cos{\frac{\pi}{p}}\\
+\vec{a} \cdot \vec{c} & = -\cos{\frac{\pi}{q}}\\
+\vec{c} \cdot \vec{b} & = -\cos{\frac{\pi}{r}}
+\end{aligned}@@</p>
+<p>Choose $\vec{a}$ and $\vec{b}$ to lie in the $xy$ plane making angle $\frac{\pi}{p}$:</p>
+<p>@@ \begin{aligned}
+\vec{a} &= \left\langle1,0,0\right\rangle\\
+\vec{b} &= \left\langle -\cos{\frac{\pi}{p}},\sin{\frac{\pi}{p}},0\right\rangle
+\end{aligned}@@</p>
+<p>Notice that $a_2=0$ so, regardless of metric,</p>
+<p>@@ \begin{aligned}
+\vec{a} \cdot \vec{c} &= a_0 c_0 +a_1c_1\\
+&= c_0
+\end{aligned}@@</p>
+<p>Next we solve for $c_1$. $b_2=0$ so $\vec{b} \cdot \vec{c}$ is simply (again, regardless of metric):</p>
+<p>@@ \begin{aligned}
+\vec{b} \cdot \vec{c} &= b_0 c_0 +b_1c_1\\
+c_1&=\frac{\vec{b}\cdot \vec{c} -b_0c_0}{b_1}\\
+\end{aligned}@@</p>
+<p>$\vec{c}$ must be a unit vector, so $\vec{c} \cdot \vec{c} = 1$. But, we don&rsquo;t know what metric we&rsquo;re in, so we parametrize it with $k\in{-1,0,1}$.</p>
+<p>@@ \begin{aligned}
+1&=c_0^2+c_1^2+kc_2^2\\
+k{c_2}^2 &= 1-c_0^2-c_1^2\\
+\left|k{c_2}^2\right| &= \left|1-c_0^2-c_1^2\right|\\
+c_2 &= \sqrt{\left|1-c_0^2-c_1^2\right|}
+\end{aligned}@@</p>
+<p>We picked the positive square root for $c_2$, which is an arbitrary choice in the Euclidean case but in the hyperbolic case, there are actually two arms of the hyperbola (one pointing up, the other down). We want to build the tiling in the upper one and this choice does that for us.</p>
+<p>The parameter $k$ has fallen away, so we actually have a formula that works for either hyperbolic or spherical triangles. For Euclidean ones, $k=0$ so $c_2$ can be any constant, and it just acts like a scaling factor.</p>
+<p>We can now substitute back in the dot products, to get the final values for the components of $\vec{c}$</p>
+<p>@@ \begin{aligned}
+c_0 &= -\cos{\frac{\pi}{q}}\\
+c_1 &= \frac{ -\cos{\frac{\pi}{q}} -\cos{\frac{\pi}{p}}\cos{\frac{\pi}{r}}}{\sin{\frac{\pi}{p}}}\\
+c_2 &= \sqrt{\left|\sin^2{\frac{\pi}{r}}-c_1^2\right|}\\
+\end{aligned}@@</p>
+<p>The last thing we need is an equation to project points in the plane to points on the hyperbola or sphere. There are a few choices, but we&rsquo;re going to use a stereographic projection. The idea is to draw a line between $(0,0,-1)$ and a point on the surface, and map that point to the intersection of line with the plane at $z=0$.</p>
+<p>We are going to work in two dimensions to make the algebra much easier. The surfaces have rotational symmetry around the $z$ axis, so we can work in $(r,z)$ coordinates. $r$ is the distance away from the $z$ axis and corresponds to the $x$ dimension.</p>
+<p>@@r,z \mapsto \left( R,Z \right) = \left( \frac{r}{1+z},0\right) @@</p>
+<p>We need to invert the transformation to take the plane to the surfaces. We can define the surfaces like this:</p>
+<p>@@z^2 + kr^2 = 1, k \in \left(-1,0,1\right)@@</p>
+<p>So, we start with $\frac{r}{1+z}$, square it, substitute in and solve for $z$:</p>
+<p>@@ \begin{aligned}
+R^2 &= \frac{r^2}{(1+z)^2}\\ 
+&= \frac{1}{k} \frac{1-z^2}{(1+z)^2} = k \frac{(1+z)(1-z)}{(1+z)^2}\\
+&= k \frac{1-z}{1+z}  \\
+R^2 (1+z) &= k (1-z)  \\
+R^2 + R^2 z &= k - kz \\
+R^2 z + kz &= k - R^2 \\
+z &= \frac{k - R^2}{k + R^2} = \frac{k - R^2}{k + R^2} \frac{k}{k}\\
+\therefore z &= \frac{1 - kR^2}{1 + kR^2}
+\end{aligned}@@</p>
+<p>And we can now solve for $r$:</p>
+<p>@@ \begin{aligned}
+R &= \frac{r}{1+z} \\
+r &= \left(1+z\right) R \\
+r &= \left(1+\frac{1-kR^2}{1+kR^2}\right) R \\
+r &= \left(\frac{1+kR^2}{1+kR^2}+\frac{1-kR^2}{1+kR^2}\right) R \\
+\therefore r &= \frac{2R}{1+kR^2}
+\end{aligned}@@</p>
+<p>So the transformation is</p>
+<p>@@ R \mapsto \left(\frac{2R}{1+kR^2}, \frac{1 - kR^2}{1 + kR^2}\right)@@</p>
+<p>We can pull this into two dimensions easily. $R^2 = X^2+Y^2$, and doubling $R$ doubles both $X$ and $Y$, so the final function looks like:</p>
+<p>@@ \left(X,Y\right) \mapsto \left(\frac{2X}{1+k\left(X^2+Y^2\right)}, \frac{2Y}{1+k\left(X^2+Y^2\right)}, \frac{1-k\left(X^2+Y^2\right)}{1+k\left(X^2+Y^2\right)}\right)@@</p>
+<p>Pulling this all together, and out pops the tilings we want. Adjust <code>p,q,r</code> to see how they behave.</p>
+<div class="codeAndCanvas" data="
+// Adjust p, q, r
+float p = 3.; float q=4.; float r=3.;
+float space = float(sign(q*r+p*r+p*q-p*q*r));
+vec3 fold( vec3 p, in vec3 dir, inout int n) {
+// Reflect if we're outside the fundamental region
+    float dt = dot(p,dir);
+    if (dt < 0.) {
+        n = n + 1;
+        return p-2.*dt*dir*vec3(1,1,space);
+    }
+    return p;
+}
+vec3 color(vec2 z) {
+    // Stereographically project
+    vec3 w=vec3(2.*z,1.-space*dot(z,z))*1./(1.+space*dot(z,z));
+    // Calculate cutting planes
+    float ab = -cos(PI/p);
+    float bc = -cos(PI/q);
+    float ac = -cos(PI/r);
+    vec3 a = vec3(1,0,0);
+    vec3 b = vec3(ab,sin(PI/p),0.);
+    float c0 = ac;
+    float c1 = (bc-b[0]*c0)/b[1];
+    vec3 c = vec3(c0,c1,sqrt(abs(1.-c0*c0-c1*c1)));
+    if (space==0.)
+        c[2] = .5;
+    // Fold across the planes a few times
+    int n=0; int m = 0;
+    for (int i=0;i<10;i++){
+        w = fold(w,a,m);
+        w = fold(w,b,m);
+        w = fold(w,c,n);
+    }
+    // Return a color based on where you end up
+    return vec3(2.)*(dot(w,a));
+}"></div>
+<p>In the hyperbolic case, we can investigate other projections, such as just pulling the point in the plane up to the hyperboloid:</p>
+<div class="codeAndCanvas" pre="float p = 3.; float q=4.; float r=3.;
+float space = float(sign(q*r+p*r+p*q-p*q*r));
+vec3 fold( vec3 p, in vec3 dir, inout int n) {
+    float dt = dot(p,dir);
+    if (dt < 0.) {
+        n = n + 1;
+        return p-2.*dt*dir*vec3(1,1,space);
+    }
+    return p;
+}
+vec3 calc(vec3 w){
+    // Calculate cutting planes
+    float ab = -cos(PI/p);
+    float bc = -cos(PI/q);
+    float ac = -cos(PI/r);
+    vec3 a = vec3(1,0,0);
+    vec3 b = vec3(ab,sin(PI/p),0.);
+    float c0 = ac;
+    float c1 = (bc-b[0]*c0)/b[1];
+    vec3 c = vec3(c0,c1,sqrt(abs(1.-c0*c0-c1*c1)));
+    if (space==0.)
+        c[2] = .5;
+    // Fold across the planes a few times
+    int n=0; int m = 0;
+    for (int i=0;i<10;i++){
+        w = fold(w,a,m);
+        w = fold(w,b,m);
+        w = fold(w,c,n);
+    }
+    // Return a color based on where you end up
+    return vec3(2.)*(dot(w,a));
+}" data="vec3 color(vec2 z) {
+    z *= 20.;
+    vec3 w=vec3(z,sqrt(1.+dot(z,z)));
+    // Calculate the tiling
+    return calc(w);
+}"></div>
+<div style='clear:right'></div>
+<p>We can also apply a <a href="http://www.physicsinsights.org/hyperbolic_rotations.html">hyperbolic rotation</a> to the hyperbolic tiling, which acts like a translation along the hyperboloid.</p>
+<div class="codeAndCanvas" pre="float p = 4.; float q=5.; float r=2.;
+float space = float(sign(q*r+p*r+p*q-p*q*r));
+vec3 fold( vec3 p, in vec3 dir, inout int n) {
+    float dt = dot(p,dir);
+    if (dt < 0.) {
+        n = n + 1;
+        return p-2.*dt*dir*vec3(1,1,space);
+    }
+    return p;
+}
+vec3 calc(vec3 w){
+    float ab = -cos(PI/p);
+    float bc = -cos(PI/q);
+    float ac = -cos(PI/r);
+    int n=0; int m = 0;
+    vec3 a = vec3(1,0,0);
+    vec3 b = vec3(ab,sin(PI/p),0.);
+    float c0 = ac;
+    float c1 = (bc-b[0]*c0)/b[1];
+    vec3 c = vec3(c0,c1,sqrt(abs(1.-c0*c0-c1*c1)));
+    if (space==0.)
+        c[2] = .5;
+    for (int i=0;i<10;i++){
+        w = fold(w,a,m);
+        w = fold(w,b,m);
+        w = fold(w,c,n);
+    }
+    return vec3(2.)*(dot(w,a));
+}" data="vec3 color(vec2 z) {
+    vec3 w = vec3(2.*z,1.-space*dot(z,z))*1./(1.+space*dot(z,z));
+    // Apply hyperbolic rotation
+	float angle = mod(u_time,1.05);
+    w.xz = w.xz * mat2(cosh(angle),sinh(angle),
+    				   sinh(angle),cosh(angle)); 
+    return calc(w);
+}"></div>
+<div style='clear:right'></div>
+<p>That&rsquo;s all for now. This is a lot more laborious than just inverting across circles, but being able to mostly avoid trigonometry has an appeal all its own, I think!</p>
+
+</div>
+
+
+  <div>&lt; Previous: <a href="/posts/folding-tilings/">Folding Animated Hyperbolic &amp; Spherical Tilings </a></div>
+
+
+<div class="related">
+
+
+<h3>See Also</h3>
+	
+  <div class="related-posts" style="float: left;max-width: 33%; padding-left: 5px; padding-right: 5px;">
+    <a href="/posts/folding-tilings/">
+      
+       
+        
+        <img width="200" src="/images/covers/folding-tilings.png"/>
+        
+       
+      
+    Folding Animated Hyperbolic &amp; Spherical Tilings
+    </a>
+</div>
+
+	
+  <div class="related-posts" style="float: left;max-width: 33%; padding-left: 5px; padding-right: 5px;">
+    <a href="/posts/folding-the-koch-snowflake/">
+      
+       
+        
+        <img width="200" src="/images/covers/koch-snowflake.png"/>
+        
+       
+      
+    3D Kaleidoscopic Fractals: Folding the Koch Snowflake
+    </a>
+</div>
+
+	
+  <div class="related-posts" style="float: left;max-width: 33%; padding-left: 5px; padding-right: 5px;">
+    <a href="/posts/building-eschers-square-limit/">
+      
+       
+        
+        <img width="200" src="/images/covers/building-eschers-square-limit.png"/>
+        
+       
+      
+    Building Escher&#39;s Square Limit in Pixels
+    </a>
+</div>
+
+	
+
+</div>
+
+    </main>
+
+    
+      
+    
+  </body>
+</html>

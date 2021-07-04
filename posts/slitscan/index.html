@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-us" lang="en-us">
+<head>
+  <link href="https://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="generator" content="Hugo 0.78.1" />
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Recreating the Doctor Who Time Tunnel in GLSL &middot; Roy&#39;s blog</title>
+  <meta name="description" content="" />
+
+  
+  <link type="text/css" rel="stylesheet" href="css/print.css" media="print">
+  <link type="text/css" rel="stylesheet" href="css/poole.css">
+  <link type="text/css" rel="stylesheet" href="css/syntax.css">
+  <link type="text/css" rel="stylesheet" href="css/hyde.css">
+  <link type="text/css" rel="stylesheet" href="css/glslEditor.css">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Abril+Fatface|PT+Sans:400,400i,700">
+  <link href="//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic" rel="stylesheet" type="text/css">
+
+  
+  
+
+  
+  <script type="application/javascript" src="/scripts/glslEditor.js"></script>
+  <script type="text/javascript" src="/scripts/GlslCanvas.js"></script>
+  
+  <script type="text/javascript" src="/scripts/main.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+
+    
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+
+    
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"
+        onload='renderMathInElement(document.body, {delimiters:[
+  {left: "$", right: "$", display: false},
+  {left: "@@", right: "@@", display: true},
+]});'></script></script>
+  
+</head>
+
+  <body class="theme-base-08 ">
+  <aside class="sidebar">
+  <div class="container">
+    <div class="sidebar-about">
+      <a href=""><h1>Roy&#39;s blog</h1></a>
+      <p class="lead">
+         
+      </p>
+    </div>
+
+    <nav>
+      <ul class="sidebar-nav">
+        <li><a href="">Home</a> </li>
+        <li><a href="https://github.com/RoyWiggins/"> Github </a></li><li><a href="/editor"> Shader Editor </a></li><li><a href="https://twitter.com/RoyWiggins/"> Twitter </a></li>
+
+        <li><a href="/pages/resources/"> Resources </a></li><li><a href="/pages/resume/">  </a></li>        
+          
+      </ul>
+    </nav>
+
+    
+  </div>
+</aside>
+
+    <main class="content container">
+    <div class="post">
+  <h1>Recreating the Doctor Who Time Tunnel in GLSL</h1>
+  <time datetime=2016-04-27T21:34:06Z class="post-date">Wed, Apr 27, 2016</time>
+  
+
+
+
+<figure  style="float:right">
+    <img src="stargate.gif" width="300"/> 
+</figure>
+<p>The slit-scan effect is a classic analog special effect. It was most famously used during the &ldquo;Stargate&rdquo; sequence in 2001: A Space Odyssey, and a title sequence in Doctor Who. It was done &ldquo;in camera&rdquo;- no CGI here at all. It turns out this effect is easy to implement as a WebGL <a href="http://patriciogonzalezvivo.com/2015/thebookofshaders/01/">fragment shader</a>, and the transformation can be done in only a few lines of code!</p>
+<p>FilmmakerIQ produced a great explanation on how the method works practically. It&rsquo;s not required watching, but it explains it visually and shows how it was done.</p>
+<center><iframe src="https://www.youtube.com/embed/KhRo2WbWnKU" width="640" height="360" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></center>
+<p>In case you prefer text: the idea is that you want an animation flying through an animated tunnel. You cut a slit in a card; behind that card is colored plastic brightly lit from behind. You open the camera&rsquo;s shutter and pull it back from the slit. From the point of view of the camera, the slit shrinks and approaches the vanishing point at the center of the frame. Since you did a long exposure, the entire trail of the slit is exposed: it looks like a foreshortened rectangle.</p>
+<p>The real trick is that you move the transparency horizontally (behind the slit) as the camera is moved backward. Successive slices of the texture on the transparency will get exposed to successively &ldquo;further away&rdquo; slices on the foreshortened rectangle on film. After you expose one frame, you reset the setup except you advance the start position of the transparency slightly. Rinse repeat and suddenly you have an animated tunnel.</p>
+<p>It turns out you can perform the same tric with an arbitrarily-shaped &ldquo;slit.&rdquo; Instead of a line, your slit can be a square, a circle, or probably anything. The second-most famous use of the slit-scan showed multiple shapes off: for the Doctor Who time-tunnel, there&rsquo;s even a TARDIS-shaped effect!</p>
+<center><iframe width="640" height="360" src="https://www.youtube.com/embed/1fnzcAFy8d8" frameborder="0" allowfullscreen></iframe></center>
+<p>That&rsquo;s enough intro. Let&rsquo;s start implementing the sequence I found most intriguing: the circular tunnel from Doctor Who. Don&rsquo;t forget that the examples here are all live: you can tweak them and the visuals will update themselves thanks to code borrowed from the <a href="http://patriciogonzalezvivo.com/2015/thebookofshaders/">Book of Shaders</a>.</p>
+<p>To start with, we need a texture. Different textures produce widely varying results, but here&rsquo;s one good one using iq&rsquo;s <a href="https://www.shadertoy.com/view/Xd23Dh">voronoise</a>.</p>
+<div class="codeAndCanvas" data="vec3 color(vec2 pt) {
+    return vec3(iqnoise(5.*pt,1.,1.));
+}"></div>
+<p>So. Let&rsquo;s think about the physical way the time-tunnel is created. A given frame can be thought of as composed of a large number of concentric rings, each one corresponding to an exposure of the circular slit imaged at different distances. If a strobe was flashed as the camera moved, there really would be a bunch of visible rings.</p>
+<p>If the transparency never moves, the rings in the final image will all correspond to the <em>same</em> ring in the original. Let&rsquo;s decide that it&rsquo;s the <a href="https://en.wikipedia.org/wiki/Unit_circle">unit circle</a> (centered at the origin with radius 1). To find how to color a particular pixel, we are going to divide it by its distance to the origin. This will scale it up or down to lie on the unit circle.</p>
+<div class="codeAndCanvas" data="vec3 color(vec2 pt) {
+	pt = pt / length(pt);
+    return vec3(iqnoise(5.*pt,1.,1.));
+}"></div>
+<p>Well! That looks about right. It&rsquo;s got the feel of a Star Wars hyperspace jump. The problem is, we&rsquo;re mapping everything to the same slit without moving the pattern, so to speak.</p>
+<p>We need to displace the pattern horizontally, but how much? It turns out the right answer is exactly <code>1 / length(pt)</code>. This was arrived at by motivated guessing, but the explanation is fairly straightforward. In general, the apparent size of an object is proportional to the reciprocal of its depth in the scene. The inverse of the distance to the origin is exactly how far along each ring is in the tunnel, and we want to paint the texture along the inside of the tunnel.</p>
+<div class="codeAndCanvas" data="vec3 color(vec2 pt) {
+    float rInv = 1./length(pt);
+	pt = pt * rInv - vec2(rInv,0.0);
+    return vec3(iqnoise(5.*pt,1.,1.));
+}"></div>
+<p>And suddenly (shockingly) we&rsquo;ve found ourselves in a time tunnel.</p>
+<p>With a few tweaks, you can animate the tunnel and begin to approach the original effect.</p>
+<div style='clear:right'></div>
+<div class="codeAndCanvas" data="vec3 color(vec2 pt) {
+    pt = 1.2*pt;
+    float rInv = 1./length(pt);
+    pt = pt * rInv - vec2(rInv+2.*mod(u_time,6000.),0.0);
+    vec3 color = vec3(0.659,0.772,1.000);
+    return color*vec3(iqnoise(5.*pt,1.,1.)+0.240*rInv);
+}"></div>
+<p>What&rsquo;s really fun is that we really are mimicking the original analog transformation, all without drawing a single polygon. I misspent a few hours hand-painting a texture, and managed to render a tunnel whose outlines match the original more or less exactly, so I am confident that this transformation (ignoring constants) really is equivalent to a slit-scan.</p>
+<!-- <div style='position:relative;padding-bottom:calc(50% / 2.00);clear:right;'><iframe src='https://gfycat.com/ifr/IdealFamiliarCusimanse' frameborder='0' scrolling='no' width='100%' height='100%' style='position:absolute;top:0;left:0;' allowfullscreen></iframe></div> -->
+<div style="display:flex;border-radius: 5px; ">
+<video style="flex: 50%; max-width:50%; " muted loop autoplay src="time-tunnel.mp4"></video>
+<video style="flex: 50%;max-width:50%; object-fit: cover;" muted loop autoplay src="original-slitscan-tunnel.mp4"> </video>
+</div>
+<p>Perhaps you want a different shaped tunnel. It&rsquo;s quite easy to induce different shapes simply by altering the distance function. Instead of taking <code>length(pt)</code>, we will use our own function. By and large, a graph of the <a href="https://en.wikipedia.org/wiki/Contour_line">contour lines</a> of this function will reflect the apparent shape of the tunnel. Comment out the marked lines here to experiment with different distance functions.</p>
+<div class="codeAndCanvas" data="float dist(vec2 pt) {
+	//return min(abs(pt.x+pt.y),abs(pt.x-pt.y))+0.001;
+    //return abs(pt.x+pt.y);
+    //return abs(pt.x)+abs(pt.y);
+	//return max(abs(pt.x),abs(pt.y));
+	return abs(pt.x);
+}
+vec3 color(vec2 pt) {
+    float rInv = 1./dist(pt);
+    // Uncomment below to show contours
+    // return vec3(fract(rInv));
+	pt = pt * rInv - vec2(rInv+mod(u_time,6000.),0.0);
+    return vec3(iqnoise(5.*pt,1.,1.)+0.09*rInv);
+}"></div>
+<p>I also have a version of this <a href="https://www.shadertoy.com/view/4dtSWS">published on Shadertoy</a> (warning: autoplay sound). That&rsquo;s all for now! There is surely more to explore here- for instance, I haven&rsquo;t found any obvious distance functions that approximate a TARDIS outline, or Tom Baker&rsquo;s head&hellip;</p>
+
+</div>
+
+<div style="text-align:right;">
+  Next: <a href="/posts/interference/">Fun with interference patterns </a> &gt;</div>
+
+
+  <div>&lt; Previous: <a href="/posts/droste/">Implementing the Droste effect in WebGL </a></div>
+
+
+<div class="related">
+
+
+<h3>See Also</h3>
+	
+  <div class="related-posts" style="float: left;max-width: 33%; padding-left: 5px; padding-right: 5px;">
+    <a href="/posts/building-eschers-square-limit/">
+      
+       
+        
+        <img width="200" src="/images/covers/building-eschers-square-limit.png"/>
+        
+       
+      
+    Building Escher&#39;s Square Limit in Pixels
+    </a>
+</div>
+
+	
+  <div class="related-posts" style="float: left;max-width: 33%; padding-left: 5px; padding-right: 5px;">
+    <a href="/posts/infinite-regression/">
+      
+       
+        
+        <img width="200" src="/images/covers/infinite-regression.png"/>
+        
+       
+      
+    Infinite Regression: Many Pictures From One Function
+    </a>
+</div>
+
+	
+  <div class="related-posts" style="float: left;max-width: 33%; padding-left: 5px; padding-right: 5px;">
+    <a href="/posts/fractal-droste-images/">
+      
+       
+        
+        <img width="200" src="/images/covers/fractal-droste.png"/>
+        
+       
+      
+    Drawing fractal Droste images
+    </a>
+</div>
+
+	
+
+</div>
+
+    </main>
+
+    
+      
+    
+  </body>
+</html>
